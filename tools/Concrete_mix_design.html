@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Mix Design | Er. Shankar Bhujel</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1e2733;
+            --border: #2d3748;
+            --accent: #e8a045;
+            --accent2: #4a9eff;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --highlight: #f0c060;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        nav .logo { font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 7rem 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        h2.section-title {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 2rem 0 1rem 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        label { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+
+        input, select {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.7rem;
+            color: var(--text);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { outline: none; border-color: var(--accent2); }
+
+        .btn-group { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-report { background: transparent; border: 1px solid var(--accent2); color: var(--accent2); }
+
+        #output-section { margin-top: 3rem; display: none; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
+        
+        .summary-box {
+            background: var(--surface2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent2);
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        /* Branding Footer */
+        .footer-brand {
+            padding: 3rem 0;
+            text-align: center;
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 6px; /* Spaced between letters */
+            opacity: 0.8;
+        }
+
+        /* PRINT CONFIGURATION */
+        @media print {
+            @page { size: A4; margin: 1cm; }
+            nav, .btn-group, h1, .section-title, p.info { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .container { padding: 0; max-width: 100%; }
+            .tool-card { border: none; background: white !important; padding: 0; box-shadow: none; }
+            input, select { border: none; background: transparent; color: black !important; padding: 0; font-weight: bold; -webkit-appearance: none; }
+            label { color: #555 !important; font-size: 9px; }
+            .grid { grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+            #output-section { display: block !important; margin-top: 20px; }
+            table { background: white; color: black; border: 1px solid #000; }
+            th, td { border: 1px solid #000; color: black !important; padding: 6px; font-size: 11px; }
+            .summary-box { border: 1px solid #000; background: #f5f5f5 !important; color: black; }
+            
+            .print-header { 
+                display: block !important; 
+                border-bottom: 2px solid black; 
+                margin-bottom: 30px; 
+                padding-bottom: 10px; 
+                text-align: center;
+            }
+            
+            .footer-brand {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                color: #888 !important;
+                background: transparent;
+            }
+        }
+        .print-header { display: none; }
+    </style>
+</head>
+<body>
+
+    <nav><div class="logo">ENGINEERING.OS</div></nav>
+
+    <div class="container">
+        <div class="print-header">
+            <h2 style="color:black; margin-bottom: 5px;">CONCRETE MIX DESIGN REPORT</h2>
+            <p style="font-size:12px; letter-spacing: 1px;">CALCULATED AS PER IS 10262:2019</p>
+        </div>
+
+        <div class="tool-card">
+            <h1 style="margin-bottom: 0.5rem;">Advanced Lab Calculator</h1>
+            <p style="color:var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">Full parameter input for laboratory research work.</p>
+
+            <h2 class="section-title">1. Structural & Environmental</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label>Concrete Grade</label>
+                    <select id="fck">
+                        <option value="20">M20</option><option value="25">M25</option>
+                        <option value="30" selected>M30</option><option value="35">M35</option>
+                        <option value="40">M40</option><option value="50">M50</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Std. Deviation (S)</label>
+                    <input type="number" id="sd" value="5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label>Target Slump (mm)</label>
+                    <input type="number" id="slump" value="100">
+                </div>
+                <div class="input-group">
+                    <label>W/C Ratio</label>
+                    <input type="number" id="wc" value="0.45" step="0.01">
+                </div>
+            </div>
+
+            <h2 class="section-title">2. Material Physics</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label>S.G. Cement</label>
+                    <input type="number" id="sg_c" value="3.15" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>S.G. Fine Aggregate</label>
+                    <input type="number" id="sg_fa" value="2.65" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>S.G. Coarse Aggregate</label>
+                    <input type="number" id="sg_ca" value="2.74" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Admixture Dosage (%)</label>
+                    <input type="number" id="adm" value="1.0" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label>Max Aggregate Size</label>
+                    <select id="max_agg">
+                        <option value="10">10mm</option><option value="20" selected>20mm</option><option value="40">40mm</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Sand Grading Zone</label>
+                    <select id="zone">
+                        <option value="1">Zone I</option><option value="2" selected>Zone II</option>
+                        <option value="3">Zone III</option><option value="4">Zone IV</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="calculateMix()">Run Analysis</button>
+                <button class="btn btn-report" id="printBtn" style="display:none;" onclick="window.print()">Export A4 PDF</button>
+            </div>
+
+            <div id="output-section">
+                <h2 class="section-title">3. Final Proportions (per m³)</h2>
+                <table>
+                    <thead>
+                        <tr><th>Material Component</th><th>Spec. Gravity</th><th>Mass (kg)</th></tr>
+                    </thead>
+                    <tbody id="result-body"></tbody>
+                </table>
+                <div class="summary-box" id="final-ratio"></div>
+            </div>
+        </div>
+
+        <div class="footer-brand">By Er. Shankar Bhujel</div>
+    </div>
+
+    <script>
+        function calculateMix() {
+            const fck = parseFloat(document.getElementById('fck').value);
+            const sd = parseFloat(document.getElementById('sd').value);
+            const wc = parseFloat(document.getElementById('wc').value);
+            const slump = parseFloat(document.getElementById('slump').value);
+            const adm = parseFloat(document.getElementById('adm').value) / 100;
+            const zone = parseInt(document.getElementById('zone').value);
+            const sgC = parseFloat(document.getElementById('sg_c').value);
+            const sgCA = parseFloat(document.getElementById('sg_ca').value);
+            const sgFA = parseFloat(document.getElementById('sg_fa').value);
+            const maxAgg = parseInt(document.getElementById('max_agg').value);
+
+            // Target Strength
+            const f_target = fck + (1.65 * sd);
+
+            // Water Calculation
+            let water = (maxAgg === 10) ? 208 : (maxAgg === 40 ? 165 : 186);
+            if(slump > 50) water += water * (((slump - 50) / 25) * 0.03);
+            if(adm > 0) water *= 0.82; // 18% reduction avg
+
+            const cement = water / wc;
+            const volC = cement / (sgC * 1000);
+            const volW = water / 1000;
+            const volTotalAgg = 0.985 - volC - volW; // 1.5% air trapped
+
+            // Volume CA Ratio
+            let volCA_ratio = (maxAgg === 20) ? 0.62 : (maxAgg === 10 ? 0.48 : 0.69);
+            volCA_ratio += (0.5 - wc) * 0.01 / 0.05;
+            if(zone === 1) volCA_ratio -= 0.02;
+            if(zone === 3) volCA_ratio += 0.02;
+
+            const massCA = volTotalAgg * volCA_ratio * sgCA * 1000;
+            const massFA = volTotalAgg * (1 - volCA_ratio) * sgFA * 1000;
+
+            document.getElementById('result-body').innerHTML = `
+                <tr><td>Cement</td><td>${sgC}</td><td>${cement.toFixed(2)}</td></tr>
+                <tr><td>Water</td><td>1.00</td><td>${water.toFixed(2)}</td></tr>
+                <tr><td>Fine Aggregate (FA)</td><td>${sgFA}</td><td>${massFA.toFixed(2)}</td></tr>
+                <tr><td>Coarse Aggregate (CA)</td><td>${sgCA}</td><td>${massCA.toFixed(2)}</td></tr>
+                <tr><td>Admixture</td><td>1.15</td><td>${(adm * cement).toFixed(2)}</td></tr>
+            `;
+
+            document.getElementById('final-ratio').innerText = 
+                `Target Strength: ${f_target.toFixed(2)} N/mm² | Ratio: 1 : ${(massFA/cement).toFixed(2)} : ${(massCA/cement).toFixed(2)}`;
+
+            document.getElementById('output-section').style.display = 'block';
+            document.getElementById('printBtn').style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>
