@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brickwork BOQ Calculator</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h1, h2 { text-align: center; }
+    .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 8px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input { width: 100%; padding: 6px; margin-top: 2px; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: center; }
+    th { background: #f0f0f0; }
+    .results { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Brickwork Quantity & BOQ Calculator</h1>
+
+    <h2>Input Parameters</h2>
+    <label>Wall Length (m): <input type="number" id="length" value="10" step="0.01"></label>
+    <label>Wall Height (m): <input type="number" id="height" value="3" step="0.01"></label>
+    <label>Wall Thickness (m): <input type="number" id="thickness" value="0.23" step="0.01"></label>
+    <label>Brick Length (m): <input type="number" id="brickLength" value="0.19" step="0.01"></label>
+    <label>Brick Width (m): <input type="number" id="brickWidth" value="0.09" step="0.01"></label>
+    <label>Brick Height (m): <input type="number" id="brickHeight" value="0.09" step="0.01"></label>
+    <label>Mortar Thickness (m): <input type="number" id="mortar" value="0.01" step="0.01"></label>
+    <label>Wastage Percentage (%): <input type="number" id="wastage" value="5" step="0.1"></label>
+    <label>Rate per Brick (NPR): <input type="number" id="rate" value="15" step="1"></label>
+
+    <div class="results">
+        <h2>Calculation Results</h2>
+        <table>
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>Total Wall Volume (m³)</td><td id="wallVolume">0</td></tr>
+            <tr><td>Brick Volume with Mortar (m³)</td><td id="brickVol">0</td></tr>
+            <tr><td>Number of Bricks (No Wastage)</td><td id="numBricks">0</td></tr>
+            <tr><td>Total Bricks (Including Wastage)</td><td id="numBricksWastage">0</td></tr>
+            <tr><td>Total Cost (NPR)</td><td id="totalCost">0</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+function calculate() {
+    const L = parseFloat(document.getElementById("length").value);
+    const H = parseFloat(document.getElementById("height").value);
+    const T = parseFloat(document.getElementById("thickness").value);
+    const BL = parseFloat(document.getElementById("brickLength").value);
+    const BW = parseFloat(document.getElementById("brickWidth").value);
+    const BH = parseFloat(document.getElementById("brickHeight").value);
+    const MT = parseFloat(document.getElementById("mortar").value);
+    const wastage = parseFloat(document.getElementById("wastage").value);
+    const rate = parseFloat(document.getElementById("rate").value);
+
+    const wallVolume = L * H * T;
+    const brickVol = (BL + MT)*(BW + MT)*(BH + MT);
+    const numBricks = wallVolume / brickVol;
+    const numBricksWastage = numBricks * (1 + wastage/100);
+    const totalCost = numBricksWastage * rate;
+
+    document.getElementById("wallVolume").innerText = wallVolume.toFixed(3);
+    document.getElementById("brickVol").innerText = brickVol.toFixed(6);
+    document.getElementById("numBricks").innerText = Math.round(numBricks);
+    document.getElementById("numBricksWastage").innerText = Math.round(numBricksWastage);
+    document.getElementById("totalCost").innerText = totalCost.toFixed(2);
+}
+
+// Initial calculation
+calculate();
+
+// Add event listeners to recalculate live
+const inputs = document.querySelectorAll("input");
+inputs.forEach(input => input.addEventListener("input", calculate));
+</script>
+
+</body>
+</html>
