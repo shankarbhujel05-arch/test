@@ -1,1 +1,176 @@
-tools/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Tools — Shankar Bhujel</title>
+
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #2d3748;
+  --accent: #e8a045;
+  --accent2: #4a9eff;
+  --text: #e6edf3;
+  --muted: #8b949e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.container {
+  flex: 1;
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(232,160,69,0.15);
+}
+
+.tool-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.tool-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.tool-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.back-link a {
+  text-decoration: none;
+  color: var(--accent2);
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.back-link a:hover {
+  color: var(--accent);
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 1.2rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🔧 Engineering Tools</h1>
+  <p>Practical calculators built for real-world civil engineering tasks</p>
+</header>
+
+<div class="container">
+
+  <div class="tools-grid">
+
+    <a href="concrete.html" class="tool-card">
+      <div class="tool-icon">🧱</div>
+      <div class="tool-title">Concrete Mix Calculator</div>
+      <div class="tool-desc">
+        Calculate concrete volume and estimate material requirements
+        for slabs, beams, and columns.
+      </div>
+    </a>
+
+    <a href="survey.html" class="tool-card">
+      <div class="tool-icon">📐</div>
+      <div class="tool-title">Leveling Calculator</div>
+      <div class="tool-desc">
+        Perform rise & fall calculations and determine reduced levels
+        for surveying projects.
+      </div>
+    </a>
+
+    <a href="calculator.html" class="tool-card">
+      <div class="tool-icon">📏</div>
+      <div class="tool-title">Unit Converter</div>
+      <div class="tool-desc">
+        Convert between metric and imperial units used in
+        structural and construction engineering.
+      </div>
+    </a>
+
+  </div>
+
+  <div class="back-link">
+    <a href="../index.html">← Back to Portfolio</a>
+  </div>
+
+</div>
+
+<footer>
+  Built by Shankar Bhujel · Civil Engineering Web Toolkit
+</footer>
+
+</body>
+</html>
