@@ -1,309 +1,1108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Mix Design | Er. Shankar Bhujel</title>
-    <style>
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --surface2: #1e2733;
-            --border: #2d3748;
-            --accent: #e8a045;
-            --accent2: #4a9eff;
-            --text: #e6edf3;
-            --muted: #8b949e;
-            --highlight: #f0c060;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concrete Mix Design (IS 10262:2019) — BY Er. Shankar Bhujel</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --surface2: #e8e8e8;
+      --border: #bdbdbd;
+      --border-dark: #9e9e9e;
+      --accent: #1565C0;
+      --output: #2E7D32;
+      --text: #212121;
+      --muted: #616161;
+      --header-bg: #1565C0;
+      --header-text: #ffffff;
+      --row-alt: #f9f9f9;
+      --warn: #b71c1c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+    /* HEADER */
+    .site-header { background: var(--header-bg); color: var(--header-text); padding: 0.6rem 1.5rem; }
+    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .header-by { font-size: 1rem; font-weight: bold; letter-spacing: 0.03em; }
+    .header-tool-name { font-size: 0.82rem; opacity: 0.85; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+    /* NAV */
+    .main-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.45rem 1.5rem; font-size: 0.82rem; }
+    .main-nav a { color: var(--accent); text-decoration: none; margin-right: 1.5rem; }
+    .main-nav a:hover { text-decoration: underline; }
 
-        nav {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            height: 60px;
-            display: flex;
-            align-items: center;
-            padding: 0 2rem;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+    /* PAGE TITLE */
+    .page-title { max-width: 980px; margin: 1rem auto 0.75rem; padding: 0 1.5rem 0.6rem; border-bottom: 2px solid var(--accent); }
+    .page-title h1 { font-size: 1.25rem; color: var(--accent); margin-bottom: 0.2rem; }
+    .page-title p  { font-size: 0.82rem; color: var(--muted); }
 
-        nav .logo { font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+    /* WRAPPER */
+    .wrapper { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 2rem; }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 7rem 1.5rem 4rem;
-            flex: 1;
-        }
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.72rem; font-weight: bold; color: var(--header-bg);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      background: var(--surface2); border: 1px solid var(--border); border-bottom: none;
+      padding: 0.3rem 0.75rem; display: inline-block; margin-top: 1rem;
+    }
 
-        .tool-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    table th {
+      background: var(--accent); color: #fff; text-align: left;
+      padding: 0.4rem 0.75rem; font-size: 0.75rem; letter-spacing: 0.04em;
+      font-weight: bold; border: 1px solid #0d47a1;
+    }
+    table td { border: 1px solid var(--border); padding: 0.3rem 0.6rem; background: var(--bg); vertical-align: middle; }
+    table tr:nth-child(even) td { background: var(--row-alt); }
+    .param-label { width: 44%; font-weight: 500; color: var(--text); }
+    .param-input { width: 34%; }
+    .param-unit  { width: 22%; color: var(--muted); font-size: 0.8rem; }
 
-        h2.section-title {
-            font-size: 0.8rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 2rem 0 1rem 0;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
+    input[type="number"], input[type="text"], select {
+      width: 100%; border: 1px solid var(--border-dark);
+      padding: 0.28rem 0.5rem; font-family: Arial, sans-serif;
+      font-size: 0.88rem; background: #fff; color: var(--text); outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); outline: 1px solid var(--accent); }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.2rem;
-            margin-bottom: 1rem;
-        }
+    /* OUTPUT TABLE */
+    .output-table th { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .result-value { font-weight: bold; color: var(--output); font-family: 'Courier New', monospace; font-size: 0.92rem; }
+    .result-total { font-weight: bold; color: var(--warn); font-family: 'Courier New', monospace; font-size: 1rem; }
+    .result-highlight { font-weight: bold; color: var(--accent); font-family: 'Courier New', monospace; font-size: 0.92rem; }
 
-        .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
-        label { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+    /* BUTTONS */
+    .btn-row { margin: 0.75rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .calc-btn { background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.6rem; font-size: 0.88rem; font-family: Arial, sans-serif; cursor: pointer; font-weight: bold; }
+    .calc-btn:hover { background: #0d47a1; }
+    .reset-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border-dark); padding: 0.45rem 1.2rem; font-size: 0.88rem; font-family: Arial, sans-serif; cursor: pointer; }
+    .reset-btn:hover { background: #ddd; }
 
-        input, select {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.7rem;
-            color: var(--text);
-            font-size: 0.9rem;
-            transition: border-color 0.2s;
-        }
+    /* FORMULA BOX */
+    .formula-box { background: #fffde7; border: 1px solid #f9a825; padding: 0.6rem 1rem; font-size: 0.8rem; font-family: 'Courier New', monospace; color: #5d4037; line-height: 1.8; margin-top: 0; }
+    .formula-box strong { font-family: Arial, sans-serif; font-size: 0.78rem; }
 
-        input:focus { outline: none; border-color: var(--accent2); }
+    /* NOTE BOX */
+    .note-box { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 0.55rem 1rem; font-size: 0.8rem; color: #1b5e20; margin-top: 0.5rem; line-height: 1.6; }
 
-        .btn-group { display: flex; gap: 1rem; margin-top: 2rem; }
-        .btn {
-            padding: 0.8rem 2rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
+    /* WARN BOX */
+    .warn-box { background: #fff3e0; border: 1px solid #ffb74d; padding: 0.55rem 1rem; font-size: 0.8rem; color: #e65100; margin-top: 0.5rem; line-height: 1.6; }
 
-        .btn-primary { background: var(--accent); color: var(--bg); }
-        .btn-report { background: transparent; border: 1px solid var(--accent2); color: var(--accent2); }
+    /* TWO COLUMN */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 700px) { .two-col, .three-col { grid-template-columns: 1fr; } }
 
-        #output-section { margin-top: 3rem; display: none; }
-        
-        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        th { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
-        
-        .summary-box {
-            background: var(--surface2);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent2);
-            font-weight: 600;
-            font-family: monospace;
-        }
+    /* SUMMARY GRID */
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+    @media (max-width: 700px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
+    .summary-card { border: 1px solid var(--border); padding: 0.6rem 0.75rem; background: var(--surface); text-align: center; }
+    .summary-card .sc-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .summary-card .sc-value { font-size: 1.05rem; font-weight: bold; color: var(--output); font-family: 'Courier New', monospace; }
+    .summary-card .sc-unit  { font-size: 0.72rem; color: var(--muted); }
+    .summary-card.total .sc-value { color: var(--warn); font-size: 1.1rem; }
 
-        /* Branding Footer */
-        .footer-brand {
-            padding: 3rem 0;
-            text-align: center;
-            font-size: 0.65rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 6px; /* Spaced between letters */
-            opacity: 0.8;
-        }
+    /* FOOTER */
+    .site-footer { max-width: 980px; margin: 2rem auto 0; padding: 0.75rem 1.5rem; border-top: 1px solid var(--border); font-size: 0.76rem; color: var(--muted); }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
 
-        /* PRINT CONFIGURATION */
-        @media print {
-            @page { size: A4; margin: 1cm; }
-            nav, .btn-group, h1, .section-title, p.info { display: none !important; }
-            body { background: white !important; color: black !important; }
-            .container { padding: 0; max-width: 100%; }
-            .tool-card { border: none; background: white !important; padding: 0; box-shadow: none; }
-            input, select { border: none; background: transparent; color: black !important; padding: 0; font-weight: bold; -webkit-appearance: none; }
-            label { color: #555 !important; font-size: 9px; }
-            .grid { grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-            #output-section { display: block !important; margin-top: 20px; }
-            table { background: white; color: black; border: 1px solid #000; }
-            th, td { border: 1px solid #000; color: black !important; padding: 6px; font-size: 11px; }
-            .summary-box { border: 1px solid #000; background: #f5f5f5 !important; color: black; }
-            
-            .print-header { 
-                display: block !important; 
-                border-bottom: 2px solid black; 
-                margin-bottom: 30px; 
-                padding-bottom: 10px; 
-                text-align: center;
-            }
-            
-            .footer-brand {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                color: #888 !important;
-                background: transparent;
-            }
-        }
-        .print-header { display: none; }
-    </style>
+    /* IS code reference badge */
+    .is-ref { display: inline-block; font-size: 0.68rem; background: #e3f0ff; color: var(--accent); border: 1px solid #90caf9; padding: 0.1rem 0.4rem; margin-left: 0.4rem; font-family: 'Courier New', monospace; }
+  </style>
 </head>
 <body>
 
-    <nav><div class="logo">ENGINEERING.OS</div></nav>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <span class="header-by">BY Er. Shankar Bhujel</span>
+    <span class="header-tool-name">Concrete Mix Design — IS 10262:2019</span>
+  </div>
+</header>
 
-    <div class="container">
-        <div class="print-header">
-            <h2 style="color:black; margin-bottom: 5px;">CONCRETE MIX DESIGN REPORT</h2>
-            <p style="font-size:12px; letter-spacing: 1px;">CALCULATED AS PER IS 10262:2019</p>
-        </div>
+<!-- NAV -->
+<nav class="main-nav">
+  <a href="../index.html">← Portfolio</a>
+  <a href="index.html">Tools Index</a>
+</nav>
 
-        <div class="tool-card">
-            <h1 style="margin-bottom: 0.5rem;">Advanced Lab Calculator</h1>
-            <p style="color:var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">Full parameter input for laboratory research work.</p>
+<!-- PAGE TITLE -->
+<div class="page-title">
+  <h1>Concrete Mix Design <span style="font-size:0.85rem;font-weight:normal;color:var(--muted);">(IS 10262 : 2019 &amp; IS 456 : 2000)</span></h1>
+  <p>Full laboratory-based mix design for normal, moderate &amp; high-strength concrete — all steps as per latest IS code</p>
+</div>
 
-            <h2 class="section-title">1. Structural & Environmental</h2>
-            <div class="grid">
-                <div class="input-group">
-                    <label>Concrete Grade</label>
-                    <select id="fck">
-                        <option value="20">M20</option><option value="25">M25</option>
-                        <option value="30" selected>M30</option><option value="35">M35</option>
-                        <option value="40">M40</option><option value="50">M50</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Std. Deviation (S)</label>
-                    <input type="number" id="sd" value="5" step="0.5">
-                </div>
-                <div class="input-group">
-                    <label>Target Slump (mm)</label>
-                    <input type="number" id="slump" value="100">
-                </div>
-                <div class="input-group">
-                    <label>W/C Ratio</label>
-                    <input type="number" id="wc" value="0.45" step="0.01">
-                </div>
-            </div>
+<div class="wrapper">
 
-            <h2 class="section-title">2. Material Physics</h2>
-            <div class="grid">
-                <div class="input-group">
-                    <label>S.G. Cement</label>
-                    <input type="number" id="sg_c" value="3.15" step="0.01">
-                </div>
-                <div class="input-group">
-                    <label>S.G. Fine Aggregate</label>
-                    <input type="number" id="sg_fa" value="2.65" step="0.01">
-                </div>
-                <div class="input-group">
-                    <label>S.G. Coarse Aggregate</label>
-                    <input type="number" id="sg_ca" value="2.74" step="0.01">
-                </div>
-                <div class="input-group">
-                    <label>Admixture Dosage (%)</label>
-                    <input type="number" id="adm" value="1.0" step="0.1">
-                </div>
-                <div class="input-group">
-                    <label>Max Aggregate Size</label>
-                    <select id="max_agg">
-                        <option value="10">10mm</option><option value="20" selected>20mm</option><option value="40">40mm</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Sand Grading Zone</label>
-                    <select id="zone">
-                        <option value="1">Zone I</option><option value="2" selected>Zone II</option>
-                        <option value="3">Zone III</option><option value="4">Zone IV</option>
-                    </select>
-                </div>
-            </div>
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1 — STIPULATIONS FOR PROPORTIONING
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">1. Stipulations for Proportioning</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Grade &amp; Exposure</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Grade Designation</td>
+          <td class="param-input">
+            <select id="grade" onchange="onGradeChange()">
+              <option value="M15">M15</option>
+              <option value="M20" selected>M20</option>
+              <option value="M25">M25</option>
+              <option value="M30">M30</option>
+              <option value="M35">M35</option>
+              <option value="M40">M40</option>
+              <option value="M45">M45</option>
+              <option value="M50">M50</option>
+              <option value="M55">M55</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Type of Cement</td>
+          <td class="param-input">
+            <select id="cementType">
+              <option value="OPC43">OPC 43 Grade</option>
+              <option value="OPC53" selected>OPC 53 Grade</option>
+              <option value="PPC">PPC</option>
+              <option value="PSC">PSC</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 269/8112</td>
+        </tr>
+        <tr>
+          <td class="param-label">Exposure Condition</td>
+          <td class="param-input">
+            <select id="exposure" onchange="onExposureChange()">
+              <option value="mild">Mild</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="severe">Severe</option>
+              <option value="very_severe">Very Severe</option>
+              <option value="extreme">Extreme</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 456 Cl.8.2</td>
+        </tr>
+        <tr>
+          <td class="param-label">Type of Aggregate</td>
+          <td class="param-input">
+            <select id="aggType">
+              <option value="crushed" selected>Crushed (Angular)</option>
+              <option value="gravel">Gravel (Rounded)</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Max. Nominal Size of Aggregate</td>
+          <td class="param-input">
+            <select id="maxAggSize" onchange="onAggSizeChange()">
+              <option value="10">10 mm</option>
+              <option value="20" selected>20 mm</option>
+              <option value="40">40 mm</option>
+            </select>
+          </td>
+          <td class="param-unit">mm</td>
+        </tr>
+        <tr>
+          <td class="param-label">Degree of Workability (Slump)</td>
+          <td class="param-input"><input type="number" id="slump" value="75" min="0" max="200" step="5" /></td>
+          <td class="param-unit">mm</td>
+        </tr>
+        <tr>
+          <td class="param-label">Degree of Quality Control</td>
+          <td class="param-input">
+            <select id="qualityControl">
+              <option value="good" selected>Good</option>
+              <option value="fair">Fair</option>
+              <option value="poor">Poor</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 456 Cl.9</td>
+        </tr>
+        <tr>
+          <td class="param-label">Method of Placing Concrete</td>
+          <td class="param-input">
+            <select id="placingMethod">
+              <option value="pump">Pump</option>
+              <option value="manual" selected>Manual / Crane</option>
+              <option value="tremie">Tremie</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+      </tbody>
+    </table>
 
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="calculateMix()">Run Analysis</button>
-                <button class="btn btn-report" id="printBtn" style="display:none;" onclick="window.print()">Export A4 PDF</button>
-            </div>
+    <table>
+      <thead><tr><th colspan="3">Code Limits (Auto-filled from IS 456)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Min. Cement Content (code)</td>
+          <td class="result-value" id="r_minCement" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Max. w/c Ratio (code)</td>
+          <td class="result-value" id="r_maxWC" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Min. Grade (code)</td>
+          <td class="result-value" id="r_minGrade" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">fck (Char. Compressive Str.)</td>
+          <td class="result-value" id="r_fck" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">N/mm²</td>
+        </tr>
+        <tr>
+          <td class="param-label">Standard Deviation (σ)</td>
+          <td class="param-input"><input type="number" id="stdDev" value="4.0" min="1" max="6" step="0.1" /></td>
+          <td class="param-unit">N/mm² <span class="is-ref">IS 10262 T-1</span></td>
+        </tr>
+        <tr>
+          <td class="param-label">Target Mean Strength (f'ck)</td>
+          <td class="result-value" id="r_fckTarget" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">N/mm²</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-            <div id="output-section">
-                <h2 class="section-title">3. Final Proportions (per m³)</h2>
-                <table>
-                    <thead>
-                        <tr><th>Material Component</th><th>Spec. Gravity</th><th>Mass (kg)</th></tr>
-                    </thead>
-                    <tbody id="result-body"></tbody>
-                </table>
-                <div class="summary-box" id="final-ratio"></div>
-            </div>
-        </div>
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2 — TEST DATA FOR MATERIALS (LAB RESULTS)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">2. Test Data for Materials (Laboratory Results)</div>
+  <div class="three-col">
 
-        <div class="footer-brand">By Er. Shankar Bhujel</div>
+    <!-- CEMENT -->
+    <table>
+      <thead><tr><th colspan="3">Cement (Lab Tests)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Specific Gravity of Cement</td>
+          <td class="param-input"><input type="number" id="sgCement" value="3.15" min="2.5" max="3.5" step="0.01" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">28-day Compressive Strength</td>
+          <td class="param-input"><input type="number" id="cementStr" value="53" min="30" max="70" step="0.5" /></td>
+          <td class="param-unit">N/mm²</td>
+        </tr>
+        <tr>
+          <td class="param-label">Normal Consistency</td>
+          <td class="param-input"><input type="number" id="normalConsistency" value="30" min="20" max="45" step="0.5" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Initial Setting Time</td>
+          <td class="param-input"><input type="number" id="initialSet" value="45" min="30" max="120" step="1" /></td>
+          <td class="param-unit">min</td>
+        </tr>
+        <tr>
+          <td class="param-label">Final Setting Time</td>
+          <td class="param-input"><input type="number" id="finalSet" value="375" min="60" max="600" step="5" /></td>
+          <td class="param-unit">min</td>
+        </tr>
+        <tr>
+          <td class="param-label">Fineness (residue on 90μ)</td>
+          <td class="param-input"><input type="number" id="fineness" value="3" min="0" max="15" step="0.1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Soundness (Le Chatelier)</td>
+          <td class="param-input"><input type="number" id="soundness" value="1.5" min="0" max="10" step="0.1" /></td>
+          <td class="param-unit">mm (≤10)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FINE AGGREGATE -->
+    <table>
+      <thead><tr><th colspan="3">Fine Aggregate (Sand) — Lab Tests</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Specific Gravity (FA)</td>
+          <td class="param-input"><input type="number" id="sgFA" value="2.65" min="2.0" max="3.0" step="0.01" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Fineness Modulus (FM)</td>
+          <td class="param-input"><input type="number" id="fmFA" value="2.60" min="2.0" max="3.5" step="0.01" /></td>
+          <td class="param-unit">— <span class="is-ref">IS 383</span></td>
+        </tr>
+        <tr>
+          <td class="param-label">Zone (IS 383)</td>
+          <td class="param-input">
+            <select id="sandZone">
+              <option value="I">Zone I (Coarse)</option>
+              <option value="II" selected>Zone II</option>
+              <option value="III">Zone III</option>
+              <option value="IV">Zone IV (Fine)</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Water Absorption (FA)</td>
+          <td class="param-input"><input type="number" id="waFA" value="1.0" min="0" max="5" step="0.1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Moisture Content (FA)</td>
+          <td class="param-input"><input type="number" id="mcFA" value="0.5" min="0" max="10" step="0.1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Bulk Density — Loose</td>
+          <td class="param-input"><input type="number" id="bdFALoose" value="1450" min="1000" max="2000" step="10" /></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Bulk Density — Compact</td>
+          <td class="param-input"><input type="number" id="bdFAComp" value="1620" min="1000" max="2200" step="10" /></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Silt Content (Field Test)</td>
+          <td class="param-input"><input type="number" id="siltFA" value="2.0" min="0" max="15" step="0.1" /></td>
+          <td class="param-unit">% (≤8%)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- COARSE AGGREGATE -->
+    <table>
+      <thead><tr><th colspan="3">Coarse Aggregate — Lab Tests</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Specific Gravity (CA)</td>
+          <td class="param-input"><input type="number" id="sgCA" value="2.74" min="2.0" max="3.5" step="0.01" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Fineness Modulus (FM)</td>
+          <td class="param-input"><input type="number" id="fmCA" value="6.80" min="5.5" max="8.0" step="0.01" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Water Absorption (CA)</td>
+          <td class="param-input"><input type="number" id="waCA" value="0.5" min="0" max="5" step="0.1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Moisture Content (CA)</td>
+          <td class="param-input"><input type="number" id="mcCA" value="0.0" min="0" max="5" step="0.1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Bulk Density — Loose</td>
+          <td class="param-input"><input type="number" id="bdCALoose" value="1430" min="1000" max="2000" step="10" /></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Bulk Density — Compact</td>
+          <td class="param-input"><input type="number" id="bdCAComp" value="1560" min="1000" max="2200" step="10" /></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Aggregate Impact Value (AIV)</td>
+          <td class="param-input"><input type="number" id="aiv" value="18" min="0" max="45" step="0.1" /></td>
+          <td class="param-unit">% (≤30%)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Aggregate Crushing Value (ACV)</td>
+          <td class="param-input"><input type="number" id="acv" value="22" min="0" max="45" step="0.1" /></td>
+          <td class="param-unit">% (≤45%)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Los Angeles Abrasion Value</td>
+          <td class="param-input"><input type="number" id="laa" value="28" min="0" max="50" step="0.1" /></td>
+          <td class="param-unit">% (≤30%)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Flakiness Index</td>
+          <td class="param-input"><input type="number" id="flakiness" value="20" min="0" max="50" step="0.1" /></td>
+          <td class="param-unit">% (≤35%)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Elongation Index</td>
+          <td class="param-input"><input type="number" id="elongation" value="22" min="0" max="50" step="0.1" /></td>
+          <td class="param-unit">% (≤35%)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3 — ADMIXTURE & WATER
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">3. Admixture &amp; Water Details</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Chemical Admixture</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Use Admixture?</td>
+          <td class="param-input">
+            <select id="useAdmixture" onchange="toggleAdmixture()">
+              <option value="no">No</option>
+              <option value="yes" selected>Yes</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr id="admRow1">
+          <td class="param-label">Type of Admixture</td>
+          <td class="param-input">
+            <select id="admixType">
+              <option value="SP" selected>Superplasticizer</option>
+              <option value="WR">Water Reducer</option>
+              <option value="RE">Retarder</option>
+              <option value="AE">Air Entraining</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 9103</td>
+        </tr>
+        <tr id="admRow2">
+          <td class="param-label">Specific Gravity (Admixture)</td>
+          <td class="param-input"><input type="number" id="sgAdm" value="1.145" min="1.0" max="1.5" step="0.001" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr id="admRow3">
+          <td class="param-label">Dosage</td>
+          <td class="param-input"><input type="number" id="admDose" value="1.2" min="0.1" max="5" step="0.1" /></td>
+          <td class="param-unit">% by wt. of cement</td>
+        </tr>
+        <tr id="admRow4">
+          <td class="param-label">Water Reduction Achieved</td>
+          <td class="param-input"><input type="number" id="admWaterRed" value="20" min="0" max="40" step="1" /></td>
+          <td class="param-unit">%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <thead><tr><th colspan="3">Fly Ash / Mineral Admixture (Optional)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Use Fly Ash / GGBS?</td>
+          <td class="param-input">
+            <select id="useFlyAsh" onchange="toggleFlyAsh()">
+              <option value="no" selected>No</option>
+              <option value="flyash">Fly Ash (IS 3812)</option>
+              <option value="ggbs">GGBS (IS 16714)</option>
+              <option value="sf">Silica Fume (IS 15388)</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr id="faRow1" style="display:none;">
+          <td class="param-label">Specific Gravity</td>
+          <td class="param-input"><input type="number" id="sgFA2" value="2.20" min="1.5" max="3.5" step="0.01" /></td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr id="faRow2" style="display:none;">
+          <td class="param-label">Replacement Level</td>
+          <td class="param-input"><input type="number" id="faReplace" value="20" min="5" max="50" step="1" /></td>
+          <td class="param-unit">% by wt. of cement</td>
+        </tr>
+        <tr>
+          <td class="param-label">Source of Water</td>
+          <td class="param-input">
+            <select id="waterSource">
+              <option value="potable" selected>Potable Water</option>
+              <option value="river">River Water (tested)</option>
+              <option value="recycled">Recycled (tested)</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 456 Cl.5.4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 4 — MIX DESIGN PARAMETERS (IS 10262:2019)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">4. Mix Design Parameters</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Water Content &amp; w/c Ratio</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Free (Net) Water Content — IS table</td>
+          <td class="param-input"><input type="number" id="waterContent" value="186" min="100" max="250" step="1" /></td>
+          <td class="param-unit">kg/m³ <span class="is-ref">IS 10262 T-2</span></td>
+        </tr>
+        <tr>
+          <td class="param-label">w/c Ratio Selected</td>
+          <td class="param-input"><input type="number" id="wcRatio" value="0.50" min="0.30" max="0.70" step="0.01" /></td>
+          <td class="param-unit">— (check vs max)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Air Content (entrapped)</td>
+          <td class="param-input"><input type="number" id="airContent" value="2.0" min="0.5" max="5" step="0.5" /></td>
+          <td class="param-unit">% <span class="is-ref">IS 10262 T-3</span></td>
+        </tr>
+        <tr>
+          <td class="param-label">Volume of Concrete per Batch</td>
+          <td class="param-input"><input type="number" id="batchVol" value="1.0" min="0.01" max="100" step="0.01" /></td>
+          <td class="param-unit">m³</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <thead><tr><th colspan="3">Aggregate Proportioning</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Vol. fraction of CA in total agg.</td>
+          <td class="param-input"><input type="number" id="caFraction" value="0.62" min="0.40" max="0.80" step="0.01" /></td>
+          <td class="param-unit">— <span class="is-ref">IS 10262 T-3</span></td>
+        </tr>
+        <tr>
+          <td class="param-label">Correction for FM of FA</td>
+          <td class="param-input"><input type="number" id="fmCorrection" value="0.0" min="-0.1" max="0.1" step="0.01" /></td>
+          <td class="param-unit">±ratio per ±0.1 FM</td>
+        </tr>
+        <tr>
+          <td class="param-label">Correction for shape (rounded)</td>
+          <td class="param-input"><input type="number" id="shapeCorrection" value="0.0" min="-0.05" max="0.05" step="0.01" /></td>
+          <td class="param-unit">±ratio</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- COLLAPSIBLE FORMULAS -->
+  <div style="margin-top:0.5rem;">
+    <button onclick="toggleFormula()" id="formulaToggleBtn"
+      style="background:none;border:1px solid #f9a825;color:#5d4037;font-size:0.78rem;font-family:Arial,sans-serif;padding:0.25rem 0.75rem;cursor:pointer;">
+      ▶ Show Formulas Used (IS 10262:2019)
+    </button>
+    <div id="formulaBox" class="formula-box" style="display:none;">
+      <strong>Step-by-Step as per IS 10262:2019:</strong><br>
+      1. f'ck = fck + 1.65σ  (target mean strength)<br>
+      2. w/c from Fig.1 of IS 10262 or adopted; check ≤ IS 456 limit<br>
+      3. Free water content from IS 10262 Table 2 (function of slump &amp; agg. size)<br>
+      4. Cement content = Water content / (w/c ratio)<br>
+      5. Check cement content ≥ min. from IS 456 Table 5<br>
+      6. Volume of concrete = Vol(cement) + Vol(water) + Vol(agg.) + Vol(air)<br>
+         Vol(cement) = Cement / (Sc × 1000) m³<br>
+         Vol(water)  = Water / 1000 m³<br>
+         Vol(air)    = air% / 100<br>
+      7. Total Vol. of agg. = 1 − [Vol(cement) + Vol(water) + Vol(air)] m³<br>
+      8. Vol. of CA = Total agg. vol × r(CA fraction)<br>
+         Mass of CA = Vol(CA) × Sc(CA) × 1000 kg<br>
+      9. Vol. of FA = Total agg. vol − Vol(CA)<br>
+         Mass of FA = Vol(FA) × Sc(FA) × 1000 kg<br>
+      10. Corrections for moisture: Adjusted Water = Free water − (MC−WA)/100 × Agg mass<br>
+      11. Trial mix ratio: C : FA : CA = 1 : (FA/C) : (CA/C) with w/c<br>
+      12. Admixture mass = (dosage% / 100) × Cement content
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-row">
+    <button class="calc-btn" onclick="calculate()">Design Mix</button>
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
+    <span id="wcWarning" style="color:var(--warn);font-size:0.82rem;font-weight:bold;display:none;">⚠ w/c exceeds IS 456 limit for selected exposure!</span>
+    <span id="cementWarning" style="color:var(--warn);font-size:0.82rem;font-weight:bold;display:none;">⚠ Cement content below minimum for exposure!</span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 5 — MIX DESIGN RESULTS
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">5. Mix Design Results — Per m³ of Concrete</div>
+
+  <!-- Summary cards -->
+  <div class="summary-grid" id="summaryGrid" style="margin-bottom:0.75rem;">
+    <div class="summary-card">
+      <div class="sc-label">Cement</div>
+      <div class="sc-value" id="sc_cement">—</div>
+      <div class="sc-unit">kg/m³</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Water</div>
+      <div class="sc-value" id="sc_water">—</div>
+      <div class="sc-unit">kg/m³</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Fine Aggregate</div>
+      <div class="sc-value" id="sc_fa">—</div>
+      <div class="sc-unit">kg/m³</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Coarse Aggregate</div>
+      <div class="sc-value" id="sc_ca">—</div>
+      <div class="sc-unit">kg/m³</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="3">Proportions per m³ (SSD Condition)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Target Mean Strength (f'ck)</td>
+            <td class="result-value" id="r_target">—</td>
+            <td class="param-unit">N/mm²</td>
+          </tr>
+          <tr>
+            <td class="param-label">w/c Ratio (adopted)</td>
+            <td class="result-value" id="r_wcAdopted">—</td>
+            <td class="param-unit">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Free Water Content</td>
+            <td class="result-value" id="r_water">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Content</td>
+            <td class="result-value" id="r_cement">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Fly Ash / GGBS (if any)</td>
+            <td class="result-value" id="r_flyash">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Total Cementitious Content</td>
+            <td class="result-highlight" id="r_totalCem">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Volume of Coarse Aggregate</td>
+            <td class="result-value" id="r_volCA">—</td>
+            <td class="param-unit">m³/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Volume of Fine Aggregate</td>
+            <td class="result-value" id="r_volFA">—</td>
+            <td class="param-unit">m³/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Mass of Fine Aggregate (SSD)</td>
+            <td class="result-value" id="r_massFASSD">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Mass of Coarse Aggregate (SSD)</td>
+            <td class="result-value" id="r_massCASSD">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Admixture</td>
+            <td class="result-value" id="r_admixture">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <script>
-        function calculateMix() {
-            const fck = parseFloat(document.getElementById('fck').value);
-            const sd = parseFloat(document.getElementById('sd').value);
-            const wc = parseFloat(document.getElementById('wc').value);
-            const slump = parseFloat(document.getElementById('slump').value);
-            const adm = parseFloat(document.getElementById('adm').value) / 100;
-            const zone = parseInt(document.getElementById('zone').value);
-            const sgC = parseFloat(document.getElementById('sg_c').value);
-            const sgCA = parseFloat(document.getElementById('sg_ca').value);
-            const sgFA = parseFloat(document.getElementById('sg_fa').value);
-            const maxAgg = parseInt(document.getElementById('max_agg').value);
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="3">Corrected for Field Moisture (Actual Batch)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Adjusted FA (field)</td>
+            <td class="result-value" id="r_faField">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Adjusted CA (field)</td>
+            <td class="result-value" id="r_caField">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Adjusted Water (field)</td>
+            <td class="result-value" id="r_waterField">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+        </tbody>
+      </table>
 
-            // Target Strength
-            const f_target = fck + (1.65 * sd);
+      <table class="output-table" style="margin-top:0.75rem;">
+        <thead><tr><th colspan="3">Mix Ratio &amp; Batch Quantities (per m³)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Mix Ratio (C : FA : CA)</td>
+            <td class="result-highlight" id="r_ratio">—</td>
+            <td class="param-unit">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">w/c Ratio</td>
+            <td class="result-value" id="r_wc2">—</td>
+            <td class="param-unit">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement per Batch</td>
+            <td class="result-value" id="r_cBatch">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Water per Batch</td>
+            <td class="result-value" id="r_wBatch">—</td>
+            <td class="param-unit">litres</td>
+          </tr>
+          <tr>
+            <td class="param-label">Fine Aggregate per Batch</td>
+            <td class="result-value" id="r_faBatch">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Coarse Aggregate per Batch</td>
+            <td class="result-value" id="r_caBatch">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Admixture per Batch</td>
+            <td class="result-value" id="r_admBatch">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td style="font-weight:bold;border:1px solid var(--border);padding:0.3rem 0.6rem;">Unit Weight of Concrete</td>
+            <td class="result-total" id="r_unitWeight">—</td>
+            <td class="param-unit">kg/m³</td>
+          </tr>
+        </tbody>
+      </table>
 
-            // Water Calculation
-            let water = (maxAgg === 10) ? 208 : (maxAgg === 40 ? 165 : 186);
-            if(slump > 50) water += water * (((slump - 50) / 25) * 0.03);
-            if(adm > 0) water *= 0.82; // 18% reduction avg
+      <!-- Material compliance flags -->
+      <div class="note-box" id="complianceBox" style="margin-top:0.75rem;">
+        ℹ️ Run Design Mix to see material compliance checks.
+      </div>
+    </div>
+  </div>
 
-            const cement = water / wc;
-            const volC = cement / (sgC * 1000);
-            const volW = water / 1000;
-            const volTotalAgg = 0.985 - volC - volW; // 1.5% air trapped
+</div><!-- /wrapper -->
 
-            // Volume CA Ratio
-            let volCA_ratio = (maxAgg === 20) ? 0.62 : (maxAgg === 10 ? 0.48 : 0.69);
-            volCA_ratio += (0.5 - wc) * 0.01 / 0.05;
-            if(zone === 1) volCA_ratio -= 0.02;
-            if(zone === 3) volCA_ratio += 0.02;
+<!-- FOOTER -->
+<footer class="site-footer">
+  BY Er. Shankar Bhujel &nbsp;·&nbsp; Engineering Tools &nbsp;·&nbsp;
+  <a href="../index.html">← Back to Portfolio</a>
+</footer>
 
-            const massCA = volTotalAgg * volCA_ratio * sgCA * 1000;
-            const massFA = volTotalAgg * (1 - volCA_ratio) * sgFA * 1000;
+<script>
+// ══════════════════════════════════════════════
+// IS 456 TABLE 5 — Exposure vs limits
+// ══════════════════════════════════════════════
+const IS456 = {
+  mild:       { minCement: 300, maxWC: 0.55, minGrade: 'M20' },
+  moderate:   { minCement: 300, maxWC: 0.50, minGrade: 'M25' },
+  severe:     { minCement: 320, maxWC: 0.45, minGrade: 'M30' },
+  very_severe:{ minCement: 340, maxWC: 0.45, minGrade: 'M35' },
+  extreme:    { minCement: 360, maxWC: 0.40, minGrade: 'M40' },
+};
 
-            document.getElementById('result-body').innerHTML = `
-                <tr><td>Cement</td><td>${sgC}</td><td>${cement.toFixed(2)}</td></tr>
-                <tr><td>Water</td><td>1.00</td><td>${water.toFixed(2)}</td></tr>
-                <tr><td>Fine Aggregate (FA)</td><td>${sgFA}</td><td>${massFA.toFixed(2)}</td></tr>
-                <tr><td>Coarse Aggregate (CA)</td><td>${sgCA}</td><td>${massCA.toFixed(2)}</td></tr>
-                <tr><td>Admixture</td><td>1.15</td><td>${(adm * cement).toFixed(2)}</td></tr>
-            `;
+// IS 10262:2019 Table 1 — Standard deviation
+const stdDevMap = { M15:3.5, M20:4.0, M25:4.0, M30:5.0, M35:5.0, M40:5.0, M45:5.0, M50:5.0, M55:5.0 };
 
-            document.getElementById('final-ratio').innerText = 
-                `Target Strength: ${f_target.toFixed(2)} N/mm² | Ratio: 1 : ${(massFA/cement).toFixed(2)} : ${(massCA/cement).toFixed(2)}`;
+// Grade fck values
+const fckMap = { M15:15, M20:20, M25:25, M30:30, M35:35, M40:40, M45:45, M50:50, M55:55 };
 
-            document.getElementById('output-section').style.display = 'block';
-            document.getElementById('printBtn').style.display = 'inline-block';
-        }
-    </script>
+function set(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+function get(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n, d=2) { return isFinite(n) ? Number(n).toFixed(d) : '—'; }
+
+function onGradeChange() {
+  const grade = document.getElementById('grade').value;
+  const sd = stdDevMap[grade] || 4.0;
+  document.getElementById('stdDev').value = sd;
+  updateCodeLimits();
+}
+
+function onExposureChange() { updateCodeLimits(); }
+function onAggSizeChange()  { updateWaterContent(); }
+
+function updateCodeLimits() {
+  const exp   = document.getElementById('exposure').value;
+  const grade = document.getElementById('grade').value;
+  const fck   = fckMap[grade] || 20;
+  const sd    = get('stdDev');
+  const limits = IS456[exp] || IS456.moderate;
+
+  set('r_minCement', limits.minCement + ' kg/m³');
+  set('r_maxWC',     limits.maxWC);
+  set('r_minGrade',  limits.minGrade);
+  set('r_fck',       fck);
+
+  const target = fck + 1.65 * sd;
+  set('r_fckTarget', fmt(target, 2));
+}
+
+function updateWaterContent() {
+  // IS 10262 Table 2 approximate values (slump 25–50 / 75–100 mm)
+  const size = parseInt(document.getElementById('maxAggSize').value);
+  const slump = get('slump');
+  let baseWater = size === 10 ? 208 : size === 20 ? 186 : 165;
+  // Adjust for higher slump (each 25mm increase ~5kg)
+  if (slump > 50) baseWater += Math.round(((slump - 50) / 25) * 3);
+  document.getElementById('waterContent').value = baseWater;
+}
+
+function toggleAdmixture() {
+  const show = document.getElementById('useAdmixture').value === 'yes';
+  ['admRow1','admRow2','admRow3','admRow4'].forEach(id => {
+    document.getElementById(id).style.display = show ? '' : 'none';
+  });
+}
+
+function toggleFlyAsh() {
+  const show = document.getElementById('useFlyAsh').value !== 'no';
+  ['faRow1','faRow2'].forEach(id => {
+    document.getElementById(id).style.display = show ? '' : 'none';
+  });
+}
+
+function calculate() {
+  const grade   = document.getElementById('grade').value;
+  const exp     = document.getElementById('exposure').value;
+  const fck     = fckMap[grade] || 20;
+  const sd      = get('stdDev');
+  const limits  = IS456[exp] || IS456.moderate;
+
+  // Step 1: Target Mean Strength
+  const fckT = fck + 1.65 * sd;
+
+  // Step 2: Water & w/c
+  const useAdm     = document.getElementById('useAdmixture').value === 'yes';
+  const admWRed    = useAdm ? get('admWaterRed') / 100 : 0;
+  let   freeWater  = get('waterContent') * (1 - admWRed);
+  const wcAdopted  = get('wcRatio');
+
+  // Step 3: Cement content
+  let   cementCalc = freeWater / wcAdopted;
+
+  // Fly ash / GGBS
+  const faType   = document.getElementById('useFlyAsh').value;
+  const useFAsh  = faType !== 'no';
+  const faRepl   = useFAsh ? get('faReplace') / 100 : 0;
+  const sgFA2    = useFAsh ? get('sgFA2') : 2.20;
+  let   flyashKg = 0;
+  if (useFAsh) {
+    flyashKg  = cementCalc * faRepl;
+    cementCalc = cementCalc * (1 - faRepl);
+  }
+  const totalCem = cementCalc + flyashKg;
+
+  // Spec data
+  const sgC  = get('sgCement');
+  const sgFA = get('sgFA');
+  const sgCA = get('sgCA');
+  const air  = get('airContent') / 100;
+
+  // Volumes
+  const volCement  = cementCalc / (sgC * 1000);
+  const volFlyAsh  = flyashKg   / (sgFA2 * 1000);
+  const volWater   = freeWater  / 1000;
+  const volAir     = air;
+
+  const volAgg     = 1 - (volCement + volFlyAsh + volWater + volAir);
+
+  // CA fraction
+  let caFrac = get('caFraction') + get('fmCorrection') + get('shapeCorrection');
+  caFrac = Math.min(Math.max(caFrac, 0.4), 0.8);
+
+  const volCA = volAgg * caFrac;
+  const volFA = volAgg * (1 - caFrac);
+
+  const massCA = volCA * sgCA * 1000;
+  const massFA = volFA * sgFA * 1000;
+
+  // Field moisture corrections
+  const mcFA  = get('mcFA')  / 100;
+  const waFA  = get('waFA')  / 100;
+  const mcCA  = get('mcCA')  / 100;
+  const waCA  = get('waCA')  / 100;
+
+  const faField    = massFA * (1 + mcFA);
+  const caField    = massCA * (1 + mcCA);
+  const waterFromFA = massFA * (mcFA - waFA);
+  const waterFromCA = massCA * (mcCA - waCA);
+  const waterField  = freeWater - waterFromFA - waterFromCA;
+
+  // Admixture
+  const admDose = useAdm ? get('admDose') / 100 : 0;
+  const admKg   = totalCem * admDose;
+
+  // Batch volume
+  const batchVol = get('batchVol');
+
+  // Unit weight
+  const unitWt = cementCalc + flyashKg + freeWater + massFA + massCA + admKg;
+
+  // Mix ratio
+  const ratioFA = massFA / cementCalc;
+  const ratioCA = massCA / cementCalc;
+
+  // Compliance checks
+  const wcOK    = wcAdopted <= limits.maxWC;
+  const cemOK   = totalCem  >= limits.minCement;
+
+  // ── Display ──
+  set('r_target',    fmt(fckT)    + ' N/mm²');
+  set('r_wcAdopted', fmt(wcAdopted, 2));
+  set('r_water',     fmt(freeWater, 1) + ' kg/m³');
+  set('r_cement',    fmt(cementCalc, 1) + ' kg/m³');
+  set('r_flyash',    useFAsh ? fmt(flyashKg, 1) + ' kg/m³ (' + faType.toUpperCase() + ')' : 'Not Used');
+  set('r_totalCem',  fmt(totalCem, 1) + ' kg/m³');
+  set('r_volCA',     fmt(volCA, 4) + ' m³');
+  set('r_volFA',     fmt(volFA, 4) + ' m³');
+  set('r_massFASSD', fmt(massFA, 1) + ' kg/m³');
+  set('r_massCASSD', fmt(massCA, 1) + ' kg/m³');
+  set('r_admixture', useAdm ? fmt(admKg, 2) + ' kg/m³' : 'Not Used');
+
+  set('r_faField',   fmt(faField, 1)    + ' kg/m³');
+  set('r_caField',   fmt(caField, 1)    + ' kg/m³');
+  set('r_waterField', fmt(waterField, 1) + ' litres/m³');
+
+  set('r_ratio',     '1 : ' + fmt(ratioFA, 2) + ' : ' + fmt(ratioCA, 2));
+  set('r_wc2',       fmt(wcAdopted, 2));
+  set('r_cBatch',    fmt(cementCalc * batchVol, 1));
+  set('r_wBatch',    fmt(freeWater  * batchVol, 1));
+  set('r_faBatch',   fmt(massFA     * batchVol, 1));
+  set('r_caBatch',   fmt(massCA     * batchVol, 1));
+  set('r_admBatch',  fmt(admKg      * batchVol, 2));
+  set('r_unitWeight', fmt(unitWt, 1) + ' kg/m³');
+
+  // Summary cards
+  set('sc_cement', fmt(cementCalc, 1));
+  set('sc_water',  fmt(freeWater, 1));
+  set('sc_fa',     fmt(massFA, 1));
+  set('sc_ca',     fmt(massCA, 1));
+
+  // Update stipulation read-only fields too
+  set('r_fckTarget', fmt(fckT, 2));
+  set('r_fck',       fck);
+
+  // Warnings
+  document.getElementById('wcWarning').style.display    = wcOK  ? 'none' : 'inline';
+  document.getElementById('cementWarning').style.display = cemOK ? 'none' : 'inline';
+
+  // Compliance box
+  const checks = [
+    ['w/c Ratio (' + fmt(wcAdopted,2) + ') vs IS 456 max (' + limits.maxWC + ')', wcOK],
+    ['Total Cementitious (' + fmt(totalCem,1) + ' kg/m³) ≥ Min. (' + limits.minCement + ' kg/m³)', cemOK],
+    ['AIV (' + get('aiv') + '%) ≤ 30%',  get('aiv')       <= 30],
+    ['ACV (' + get('acv') + '%) ≤ 45%',  get('acv')       <= 45],
+    ['LAA (' + get('laa') + '%) ≤ 30%',  get('laa')       <= 30],
+    ['Flakiness (' + get('flakiness') + '%) ≤ 35%', get('flakiness') <= 35],
+    ['Elongation (' + get('elongation') + '%) ≤ 35%', get('elongation') <= 35],
+    ['Silt Content in FA (' + get('siltFA') + '%) ≤ 8%', get('siltFA') <= 8],
+    ['Soundness (' + get('soundness') + 'mm) ≤ 10mm', get('soundness') <= 10],
+  ];
+  let html = '<strong>Material Compliance Checks:</strong><br>';
+  checks.forEach(([label, pass]) => {
+    html += (pass ? '✅ ' : '❌ ') + label + '<br>';
+  });
+  document.getElementById('complianceBox').innerHTML = html;
+}
+
+function resetForm() {
+  // Grade & exposure
+  document.getElementById('grade').value        = 'M20';
+  document.getElementById('cementType').value   = 'OPC53';
+  document.getElementById('exposure').value     = 'moderate';
+  document.getElementById('aggType').value      = 'crushed';
+  document.getElementById('maxAggSize').value   = '20';
+  document.getElementById('slump').value        = 75;
+  document.getElementById('qualityControl').value = 'good';
+  document.getElementById('placingMethod').value  = 'manual';
+  document.getElementById('stdDev').value       = 4.0;
+
+  // Lab data
+  document.getElementById('sgCement').value     = 3.15;
+  document.getElementById('cementStr').value    = 53;
+  document.getElementById('normalConsistency').value = 30;
+  document.getElementById('initialSet').value   = 45;
+  document.getElementById('finalSet').value     = 375;
+  document.getElementById('fineness').value     = 3;
+  document.getElementById('soundness').value    = 1.5;
+
+  document.getElementById('sgFA').value         = 2.65;
+  document.getElementById('fmFA').value         = 2.60;
+  document.getElementById('sandZone').value     = 'II';
+  document.getElementById('waFA').value         = 1.0;
+  document.getElementById('mcFA').value         = 0.5;
+  document.getElementById('bdFALoose').value    = 1450;
+  document.getElementById('bdFAComp').value     = 1620;
+  document.getElementById('siltFA').value       = 2.0;
+
+  document.getElementById('sgCA').value         = 2.74;
+  document.getElementById('fmCA').value         = 6.80;
+  document.getElementById('waCA').value         = 0.5;
+  document.getElementById('mcCA').value         = 0.0;
+  document.getElementById('bdCALoose').value    = 1430;
+  document.getElementById('bdCAComp').value     = 1560;
+  document.getElementById('aiv').value          = 18;
+  document.getElementById('acv').value          = 22;
+  document.getElementById('laa').value          = 28;
+  document.getElementById('flakiness').value    = 20;
+  document.getElementById('elongation').value   = 22;
+
+  document.getElementById('useAdmixture').value  = 'yes';
+  document.getElementById('admixType').value     = 'SP';
+  document.getElementById('sgAdm').value         = 1.145;
+  document.getElementById('admDose').value       = 1.2;
+  document.getElementById('admWaterRed').value   = 20;
+  document.getElementById('useFlyAsh').value     = 'no';
+  document.getElementById('sgFA2').value         = 2.20;
+  document.getElementById('faReplace').value     = 20;
+  document.getElementById('waterSource').value   = 'potable';
+
+  document.getElementById('waterContent').value  = 186;
+  document.getElementById('wcRatio').value       = 0.50;
+  document.getElementById('airContent').value    = 2.0;
+  document.getElementById('batchVol').value      = 1.0;
+  document.getElementById('caFraction').value    = 0.62;
+  document.getElementById('fmCorrection').value  = 0.0;
+  document.getElementById('shapeCorrection').value = 0.0;
+
+  toggleAdmixture();
+  toggleFlyAsh();
+
+  const resultIds = ['r_target','r_wcAdopted','r_water','r_cement','r_flyash','r_totalCem',
+    'r_volCA','r_volFA','r_massFASSD','r_massCASSD','r_admixture',
+    'r_faField','r_caField','r_waterField','r_ratio','r_wc2',
+    'r_cBatch','r_wBatch','r_faBatch','r_caBatch','r_admBatch','r_unitWeight'];
+  resultIds.forEach(id => set(id, '—'));
+  ['sc_cement','sc_water','sc_fa','sc_ca'].forEach(id => set(id, '—'));
+  document.getElementById('wcWarning').style.display     = 'none';
+  document.getElementById('cementWarning').style.display = 'none';
+  document.getElementById('complianceBox').innerHTML = 'ℹ️ Run Design Mix to see material compliance checks.';
+
+  updateCodeLimits();
+}
+
+function toggleFormula() {
+  const box = document.getElementById('formulaBox');
+  const btn = document.getElementById('formulaToggleBtn');
+  const vis = box.style.display !== 'none';
+  box.style.display = vis ? 'none' : 'block';
+  btn.textContent = vis ? '▶ Show Formulas Used (IS 10262:2019)' : '▼ Hide Formulas Used (IS 10262:2019)';
+}
+
+// Init
+window.onload = function() {
+  toggleAdmixture();
+  toggleFlyAsh();
+  updateCodeLimits();
+  calculate();
+};
+</script>
 </body>
 </html>
