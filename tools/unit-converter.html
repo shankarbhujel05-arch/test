@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Civil Engineering Unit Converter — BY Er. Shankar Bhujel</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --surface2: #e8e8e8;
+      --border: #bdbdbd;
+      --border-dark: #9e9e9e;
+      --accent: #1565C0;
+      --output: #2E7D32;
+      --text: #212121;
+      --muted: #616161;
+      --header-bg: #1565C0;
+      --header-text: #ffffff;
+      --row-alt: #f9f9f9;
+      --warn: #b71c1c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+
+    /* HEADER */
+    .site-header { background: var(--header-bg); color: var(--header-text); padding: 0.6rem 1.5rem; }
+    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .header-by { font-size: 1rem; font-weight: bold; letter-spacing: 0.03em; }
+    .header-tool-name { font-size: 0.82rem; opacity: 0.85; }
+
+    /* NAV */
+    .main-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.45rem 1.5rem; font-size: 0.82rem; }
+    .main-nav a { color: var(--accent); text-decoration: none; margin-right: 1.5rem; }
+    .main-nav a:hover { text-decoration: underline; }
+
+    /* PAGE TITLE */
+    .page-title { max-width: 980px; margin: 1rem auto 0.75rem; padding: 0 1.5rem 0.6rem; border-bottom: 2px solid var(--accent); }
+    .page-title h1 { font-size: 1.25rem; color: var(--accent); margin-bottom: 0.2rem; }
+    .page-title p  { font-size: 0.82rem; color: var(--muted); }
+
+    /* WRAPPER */
+    .wrapper { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 2rem; }
+
+    /* CATEGORY TABS */
+    .cat-tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 1rem 0 0; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+    .cat-tab {
+      padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: bold;
+      border: 1px solid var(--border); border-bottom: none;
+      background: var(--surface); color: var(--muted); cursor: pointer;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .cat-tab:hover { background: #e3f0ff; color: var(--accent); }
+    .cat-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* CONVERTER PANEL */
+    .cat-panel { display: none; }
+    .cat-panel.active { display: block; }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.72rem; font-weight: bold; color: var(--header-bg);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      background: var(--surface2); border: 1px solid var(--border); border-bottom: none;
+      padding: 0.3rem 0.75rem; display: inline-block; margin-top: 1rem;
+    }
+
+    /* CONVERTER TABLE */
+    .conv-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .conv-table th {
+      background: var(--accent); color: #fff; text-align: left;
+      padding: 0.4rem 0.75rem; font-size: 0.75rem; letter-spacing: 0.04em;
+      font-weight: bold; border: 1px solid #0d47a1;
+    }
+    .conv-table td { border: 1px solid var(--border); padding: 0.3rem 0.6rem; background: var(--bg); vertical-align: middle; }
+    .conv-table tr:nth-child(even) td { background: var(--row-alt); }
+    .unit-name { width: 28%; font-weight: 500; color: var(--text); }
+    .unit-input { width: 28%; }
+    .unit-symbol { width: 12%; color: var(--muted); font-size: 0.8rem; font-family: 'Courier New', monospace; }
+    .unit-note  { width: 32%; font-size: 0.75rem; color: var(--muted); font-style: italic; }
+
+    input[type="number"] {
+      width: 100%; border: 1px solid var(--border-dark);
+      padding: 0.28rem 0.5rem; font-family: Arial, sans-serif;
+      font-size: 0.88rem; background: #fff; color: var(--text); outline: none;
+    }
+    input[type="number"]:focus { border-color: var(--accent); outline: 1px solid var(--accent); }
+    input.result-input {
+      background: #f0faf0 !important; color: var(--output) !important;
+      font-weight: bold; font-family: 'Courier New', monospace; border-color: #a5d6a7 !important;
+    }
+    input.origin-input { background: #e3f0ff !important; border-color: #90caf9 !important; font-weight: bold; }
+
+    /* NEPAL BADGE */
+    .np-badge { display: inline-block; font-size: 0.66rem; background: #fff3e0; color: #e65100; border: 1px solid #ffb74d; padding: 0.05rem 0.35rem; margin-left: 0.3rem; }
+
+    /* NOTE BOX */
+    .note-box { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 0.55rem 1rem; font-size: 0.8rem; color: #1b5e20; margin-top: 0.5rem; line-height: 1.7; }
+
+    /* CLEAR BTN */
+    .btn-row { margin: 0.6rem 0; display: flex; gap: 0.5rem; }
+    .reset-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border-dark); padding: 0.4rem 1.1rem; font-size: 0.85rem; font-family: Arial, sans-serif; cursor: pointer; }
+    .reset-btn:hover { background: #ddd; }
+
+    /* FOOTER */
+    .site-footer { max-width: 980px; margin: 2rem auto 0; padding: 0.75rem 1.5rem; border-top: 1px solid var(--border); font-size: 0.76rem; color: var(--muted); }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) { .unit-note { display: none; } .unit-name { width: 35%; } .unit-input { width: 33%; } .unit-symbol { width: 12%; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <span class="header-by">BY Er. Shankar Bhujel</span>
+    <span class="header-tool-name">Civil Engineering Unit Converter</span>
+  </div>
+</header>
+
+<nav class="main-nav">
+  <a href="../index.html">← Portfolio</a>
+  <a href="index.html">Tools Index</a>
+</nav>
+
+<div class="page-title">
+  <h1>Civil Engineering Unit Converter</h1>
+  <p>All units used in civil engineering practice — including traditional Nepali units (ropani, aana, dhur, mutthi, etc.)</p>
+</div>
+
+<div class="wrapper">
+
+  <!-- TABS -->
+  <div class="cat-tabs" id="catTabs">
+    <div class="cat-tab active" onclick="showCat('length')">📏 Length</div>
+    <div class="cat-tab" onclick="showCat('area')">⬛ Area</div>
+    <div class="cat-tab" onclick="showCat('volume')">🧊 Volume</div>
+    <div class="cat-tab" onclick="showCat('mass')">⚖️ Mass</div>
+    <div class="cat-tab" onclick="showCat('force')">🔩 Force</div>
+    <div class="cat-tab" onclick="showCat('pressure')">💧 Pressure / Stress</div>
+    <div class="cat-tab" onclick="showCat('moment')">🔄 Moment</div>
+    <div class="cat-tab" onclick="showCat('speed')">🚗 Speed</div>
+    <div class="cat-tab" onclick="showCat('discharge')">🌊 Discharge</div>
+    <div class="cat-tab" onclick="showCat('temp')">🌡️ Temperature</div>
+    <div class="cat-tab" onclick="showCat('density')">🏗️ Density</div>
+    <div class="cat-tab" onclick="showCat('angle')">📐 Angle / Slope</div>
+  </div>
+
+  <!-- ══════════════════ LENGTH ══════════════════ -->
+  <div class="cat-panel active" id="panel-length">
+    <div class="section-label">Length / Distance</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('length')">Clear</button></div>
+    <table class="conv-table" id="tbl-length">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Millimetre</td><td class="unit-input"><input type="number" data-factor="0.001" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">mm</td><td class="unit-note">Rebar dia, cover, sieve size</td></tr>
+        <tr><td class="unit-name">Centimetre</td><td class="unit-input"><input type="number" data-factor="0.01" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">cm</td><td class="unit-note">Drawing dimensions</td></tr>
+        <tr><td class="unit-name">Metre</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">m</td><td class="unit-note">Standard SI — spans, heights</td></tr>
+        <tr><td class="unit-name">Kilometre</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">km</td><td class="unit-note">Road alignment, chainage</td></tr>
+        <tr><td class="unit-name">Inch</td><td class="unit-input"><input type="number" data-factor="0.0254" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">in</td><td class="unit-note">Pipe diameter (IS/imperial)</td></tr>
+        <tr><td class="unit-name">Foot</td><td class="unit-input"><input type="number" data-factor="0.3048" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">ft</td><td class="unit-note">Land survey, floor height (NP practice)</td></tr>
+        <tr><td class="unit-name">Yard</td><td class="unit-input"><input type="number" data-factor="0.9144" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">yd</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Mile</td><td class="unit-input"><input type="number" data-factor="1609.344" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">mi</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Haat <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.4572" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">haat</td><td class="unit-note">1 haat = 18 in = 1.5 ft (traditional)</td></tr>
+        <tr><td class="unit-name">Kos <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="3218.688" oninput="convert(this,'length')" placeholder="0"/></td><td class="unit-symbol">kos</td><td class="unit-note">1 kos ≈ 2 miles ≈ 3.22 km</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ In Nepal, <strong>feet &amp; inches</strong> are widely used in construction drawings and land measurement alongside SI units.</div>
+  </div>
+
+  <!-- ══════════════════ AREA ══════════════════ -->
+  <div class="cat-panel" id="panel-area">
+    <div class="section-label">Area / Land Measurement</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('area')">Clear</button></div>
+    <table class="conv-table" id="tbl-area">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">mm²</td><td class="unit-input"><input type="number" data-factor="0.000001" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">mm²</td><td class="unit-note">Rebar cross-section area</td></tr>
+        <tr><td class="unit-name">cm²</td><td class="unit-input"><input type="number" data-factor="0.0001" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">cm²</td><td class="unit-note">Section properties</td></tr>
+        <tr><td class="unit-name">m²</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">m²</td><td class="unit-note">Floor area, formwork, plaster</td></tr>
+        <tr><td class="unit-name">km²</td><td class="unit-input"><input type="number" data-factor="1000000" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">km²</td><td class="unit-note">Watershed, catchment area</td></tr>
+        <tr><td class="unit-name">Hectare</td><td class="unit-input"><input type="number" data-factor="10000" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">ha</td><td class="unit-note">Irrigation command area, cadastral</td></tr>
+        <tr><td class="unit-name">Are</td><td class="unit-input"><input type="number" data-factor="100" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">a</td><td class="unit-note">1 are = 100 m²</td></tr>
+        <tr><td class="unit-name">Acre</td><td class="unit-input"><input type="number" data-factor="4046.856" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">ac</td><td class="unit-note">Land measurement (Terai region)</td></tr>
+        <tr><td class="unit-name">ft²</td><td class="unit-input"><input type="number" data-factor="0.092903" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">ft²</td><td class="unit-note">House plans, BOQ (NP practice)</td></tr>
+        <tr><td class="unit-name">in²</td><td class="unit-input"><input type="number" data-factor="0.00064516" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">in²</td><td class="unit-note">Rebar area (imperial)</td></tr>
+        <tr><td class="unit-name">Ropani <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="508.72" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">ro</td><td class="unit-note">Hill Nepal — 1 ropani = 508.72 m²</td></tr>
+        <tr><td class="unit-name">Aana <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="31.795" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">aana</td><td class="unit-note">1 ropani = 16 aana</td></tr>
+        <tr><td class="unit-name">Paisa <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="7.94875" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">paisa</td><td class="unit-note">1 aana = 4 paisa</td></tr>
+        <tr><td class="unit-name">Dam <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="1.9872" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">dam</td><td class="unit-note">1 paisa = 4 dam</td></tr>
+        <tr><td class="unit-name">Bigha <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="6772.63" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">bigha</td><td class="unit-note">Terai Nepal — 1 bigha = 6772.63 m²</td></tr>
+        <tr><td class="unit-name">Kattha <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="338.63" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">kattha</td><td class="unit-note">1 bigha = 20 kattha</td></tr>
+        <tr><td class="unit-name">Dhur <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="16.93" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">dhur</td><td class="unit-note">1 kattha = 20 dhur</td></tr>
+        <tr><td class="unit-name">Dhurki <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="1.69" oninput="convert(this,'area')" placeholder="0"/></td><td class="unit-symbol">dhurki</td><td class="unit-note">1 dhur = 10 dhurki</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ <strong>Hill Nepal</strong> uses Ropani–Aana–Paisa–Dam system. <strong>Terai Nepal</strong> uses Bigha–Kattha–Dhur system. Both are legally recognized in Nepal for land registration.</div>
+  </div>
+
+  <!-- ══════════════════ VOLUME ══════════════════ -->
+  <div class="cat-panel" id="panel-volume">
+    <div class="section-label">Volume / Capacity</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('volume')">Clear</button></div>
+    <table class="conv-table" id="tbl-volume">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">mm³</td><td class="unit-input"><input type="number" data-factor="0.000000001" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">mm³</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">cm³ (cc)</td><td class="unit-input"><input type="number" data-factor="0.000001" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">cm³</td><td class="unit-note">Lab specimen volume</td></tr>
+        <tr><td class="unit-name">Litre</td><td class="unit-input"><input type="number" data-factor="0.001" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">L</td><td class="unit-note">Water content, admixture dosage</td></tr>
+        <tr><td class="unit-name">m³</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">m³</td><td class="unit-note">Concrete, earthwork, excavation</td></tr>
+        <tr><td class="unit-name">ft³ (CFT)</td><td class="unit-input"><input type="number" data-factor="0.028317" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">ft³</td><td class="unit-note">Timber, aggregate supply (NP market)</td></tr>
+        <tr><td class="unit-name">in³</td><td class="unit-input"><input type="number" data-factor="0.0000163871" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">in³</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">yd³</td><td class="unit-input"><input type="number" data-factor="0.764555" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">yd³</td><td class="unit-note">Earthwork (some contracts)</td></tr>
+        <tr><td class="unit-name">US Gallon</td><td class="unit-input"><input type="number" data-factor="0.003785" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">gal</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Imperial Gallon</td><td class="unit-input"><input type="number" data-factor="0.004546" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">imp gal</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Mutthi <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.001" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">mutthi</td><td class="unit-note">≈1 litre (grain measure, approx.)</td></tr>
+        <tr><td class="unit-name">Pathi <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.004546" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">pathi</td><td class="unit-note">1 pathi ≈ 4.55 L (grain, approx.)</td></tr>
+        <tr><td class="unit-name">Mana <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.000568" oninput="convert(this,'volume')" placeholder="0"/></td><td class="unit-symbol">mana</td><td class="unit-note">1 pathi = 8 mana</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ In Nepal construction, <strong>CFT (cubic feet)</strong> is the dominant unit for timber supply. Concrete and earthwork quantities are always in <strong>m³</strong> per DoR/MoPPW standards.</div>
+  </div>
+
+  <!-- ══════════════════ MASS ══════════════════ -->
+  <div class="cat-panel" id="panel-mass">
+    <div class="section-label">Mass / Weight</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('mass')">Clear</button></div>
+    <table class="conv-table" id="tbl-mass">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Milligram</td><td class="unit-input"><input type="number" data-factor="0.000001" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">mg</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Gram</td><td class="unit-input"><input type="number" data-factor="0.001" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">g</td><td class="unit-note">Lab sample weights</td></tr>
+        <tr><td class="unit-name">Kilogram</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">kg</td><td class="unit-note">Standard — cement, steel, aggregates</td></tr>
+        <tr><td class="unit-name">Quintal</td><td class="unit-input"><input type="number" data-factor="100" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">q</td><td class="unit-note">1 quintal = 100 kg</td></tr>
+        <tr><td class="unit-name">Metric Tonne</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">t</td><td class="unit-note">Bulk material, axle load</td></tr>
+        <tr><td class="unit-name">Pound</td><td class="unit-input"><input type="number" data-factor="0.453592" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">lb</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Ounce</td><td class="unit-input"><input type="number" data-factor="0.028350" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">oz</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Short Ton (US)</td><td class="unit-input"><input type="number" data-factor="907.185" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">sh tn</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Long Ton (UK)</td><td class="unit-input"><input type="number" data-factor="1016.047" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">lg tn</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Tola <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.011664" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">tola</td><td class="unit-note">1 tola = 11.664 g (gold, jewellery)</td></tr>
+        <tr><td class="unit-name">Dharni <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="2.333" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">dharni</td><td class="unit-note">1 dharni = 2.333 kg (traditional)</td></tr>
+        <tr><td class="unit-name">Pau <span class="np-badge">NP</span></td><td class="unit-input"><input type="number" data-factor="0.233" oninput="convert(this,'mass')" placeholder="0"/></td><td class="unit-symbol">pau</td><td class="unit-note">1 dharni = 10 pau</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ Cement is sold in <strong>50 kg bags</strong> in Nepal. Steel rebar is quoted in <strong>kg/m</strong> or per <strong>metric tonne</strong>.</div>
+  </div>
+
+  <!-- ══════════════════ FORCE ══════════════════ -->
+  <div class="cat-panel" id="panel-force">
+    <div class="section-label">Force / Load</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('force')">Clear</button></div>
+    <table class="conv-table" id="tbl-force">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Newton</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">N</td><td class="unit-note">SI base unit of force</td></tr>
+        <tr><td class="unit-name">Kilonewton</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">kN</td><td class="unit-note">Structural loads (IS 456 standard)</td></tr>
+        <tr><td class="unit-name">Meganewton</td><td class="unit-input"><input type="number" data-factor="1000000" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">MN</td><td class="unit-note">Bridge, large structure loads</td></tr>
+        <tr><td class="unit-name">Kilogram-force</td><td class="unit-input"><input type="number" data-factor="9.80665" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">kgf</td><td class="unit-note">= weight of 1 kg mass</td></tr>
+        <tr><td class="unit-name">Tonne-force</td><td class="unit-input"><input type="number" data-factor="9806.65" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">tf</td><td class="unit-note">Pile load, foundation reaction</td></tr>
+        <tr><td class="unit-name">Pound-force</td><td class="unit-input"><input type="number" data-factor="4.44822" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">lbf</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Kip</td><td class="unit-input"><input type="number" data-factor="4448.22" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">kip</td><td class="unit-note">1 kip = 1000 lbf (US structural)</td></tr>
+        <tr><td class="unit-name">Dyne</td><td class="unit-input"><input type="number" data-factor="0.00001" oninput="convert(this,'force')" placeholder="0"/></td><td class="unit-symbol">dyn</td><td class="unit-note">CGS unit</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ IS codes use <strong>kN and kN/m²</strong> for loads. Note: 1 kgf ≈ 9.81 N (g = 9.81 m/s²). Many Nepal engineers still use kgf/cm² for soil bearing.</div>
+  </div>
+
+  <!-- ══════════════════ PRESSURE / STRESS ══════════════════ -->
+  <div class="cat-panel" id="panel-pressure">
+    <div class="section-label">Pressure / Stress / Bearing Capacity</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('pressure')">Clear</button></div>
+    <table class="conv-table" id="tbl-pressure">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Pascal</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">Pa</td><td class="unit-note">SI base — N/m²</td></tr>
+        <tr><td class="unit-name">Kilopascal</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">kPa</td><td class="unit-note">Soil pressure, retaining wall</td></tr>
+        <tr><td class="unit-name">Megapascal</td><td class="unit-input"><input type="number" data-factor="1000000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">MPa</td><td class="unit-note">Concrete strength (IS 456) = N/mm²</td></tr>
+        <tr><td class="unit-name">N/mm² (= MPa)</td><td class="unit-input"><input type="number" data-factor="1000000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">N/mm²</td><td class="unit-note">Compressive strength of concrete/steel</td></tr>
+        <tr><td class="unit-name">kN/m²</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">kN/m²</td><td class="unit-note">IS 875 live loads, soil bearing</td></tr>
+        <tr><td class="unit-name">kN/cm²</td><td class="unit-input"><input type="number" data-factor="10000000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">kN/cm²</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">kgf/cm²</td><td class="unit-input"><input type="number" data-factor="98066.5" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">kgf/cm²</td><td class="unit-note">Old NP practice, soil reports</td></tr>
+        <tr><td class="unit-name">kgf/m²</td><td class="unit-input"><input type="number" data-factor="9.80665" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">kgf/m²</td><td class="unit-note">Live load (old notation)</td></tr>
+        <tr><td class="unit-name">tf/m²</td><td class="unit-input"><input type="number" data-factor="9806.65" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">tf/m²</td><td class="unit-note">Bearing capacity (NP soil reports)</td></tr>
+        <tr><td class="unit-name">Bar</td><td class="unit-input"><input type="number" data-factor="100000" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">bar</td><td class="unit-note">Pipe pressure, pump pressure</td></tr>
+        <tr><td class="unit-name">Millibar</td><td class="unit-input"><input type="number" data-factor="100" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">mbar</td><td class="unit-note">Meteorology / hydrology</td></tr>
+        <tr><td class="unit-name">Atmosphere</td><td class="unit-input"><input type="number" data-factor="101325" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">atm</td><td class="unit-note">Reference pressure</td></tr>
+        <tr><td class="unit-name">psi</td><td class="unit-input"><input type="number" data-factor="6894.76" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">psi</td><td class="unit-note">Pipe test pressure, US practice</td></tr>
+        <tr><td class="unit-name">ksi</td><td class="unit-input"><input type="number" data-factor="6894757" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">ksi</td><td class="unit-note">US structural (1 ksi = 1000 psi)</td></tr>
+        <tr><td class="unit-name">m of Water Head</td><td class="unit-input"><input type="number" data-factor="9806.65" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">mWC</td><td class="unit-note">Hydrostatic / pipeline design</td></tr>
+        <tr><td class="unit-name">mm Hg (torr)</td><td class="unit-input"><input type="number" data-factor="133.322" oninput="convert(this,'pressure')" placeholder="0"/></td><td class="unit-symbol">mmHg</td><td class="unit-note">—</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ <strong>Concrete strength</strong> uses N/mm² (= MPa). <strong>Soil bearing capacity</strong> in Nepal reports is often in kgf/cm² or tf/m². IS codes use kN/m².</div>
+  </div>
+
+  <!-- ══════════════════ MOMENT ══════════════════ -->
+  <div class="cat-panel" id="panel-moment">
+    <div class="section-label">Bending Moment / Torque</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('moment')">Clear</button></div>
+    <table class="conv-table" id="tbl-moment">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">N·m</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">N·m</td><td class="unit-note">SI base</td></tr>
+        <tr><td class="unit-name">kN·m</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">kN·m</td><td class="unit-note">Beam/column design (IS 456)</td></tr>
+        <tr><td class="unit-name">MN·m</td><td class="unit-input"><input type="number" data-factor="1000000" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">MN·m</td><td class="unit-note">Bridge girder, large structures</td></tr>
+        <tr><td class="unit-name">kgf·m</td><td class="unit-input"><input type="number" data-factor="9.80665" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">kgf·m</td><td class="unit-note">Old notation, NP lab reports</td></tr>
+        <tr><td class="unit-name">tf·m</td><td class="unit-input"><input type="number" data-factor="9806.65" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">tf·m</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">lbf·ft</td><td class="unit-input"><input type="number" data-factor="1.35582" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">lbf·ft</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">lbf·in</td><td class="unit-input"><input type="number" data-factor="0.112985" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">lbf·in</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">kip·ft</td><td class="unit-input"><input type="number" data-factor="1355.82" oninput="convert(this,'moment')" placeholder="0"/></td><td class="unit-symbol">kip·ft</td><td class="unit-note">US structural</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════ SPEED ══════════════════ -->
+  <div class="cat-panel" id="panel-speed">
+    <div class="section-label">Speed / Velocity</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('speed')">Clear</button></div>
+    <table class="conv-table" id="tbl-speed">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">m/s</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">m/s</td><td class="unit-note">Flow velocity, wind speed</td></tr>
+        <tr><td class="unit-name">m/min</td><td class="unit-input"><input type="number" data-factor="0.016667" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">m/min</td><td class="unit-note">Tunnel boring, compaction speed</td></tr>
+        <tr><td class="unit-name">km/h</td><td class="unit-input"><input type="number" data-factor="0.277778" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">km/h</td><td class="unit-note">Design speed (IRC roads)</td></tr>
+        <tr><td class="unit-name">ft/s</td><td class="unit-input"><input type="number" data-factor="0.3048" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">ft/s</td><td class="unit-note">Pipe flow velocity (old practice)</td></tr>
+        <tr><td class="unit-name">ft/min</td><td class="unit-input"><input type="number" data-factor="0.00508" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">ft/min</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">mph</td><td class="unit-input"><input type="number" data-factor="0.44704" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">mph</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">Knot</td><td class="unit-input"><input type="number" data-factor="0.514444" oninput="convert(this,'speed')" placeholder="0"/></td><td class="unit-symbol">kn</td><td class="unit-note">Wind / marine</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ IRC (Indian Roads Congress, adopted in Nepal) design speeds: Urban 30–60 km/h, Highway 80–100 km/h. River flow velocity is expressed in m/s.</div>
+  </div>
+
+  <!-- ══════════════════ DISCHARGE ══════════════════ -->
+  <div class="cat-panel" id="panel-discharge">
+    <div class="section-label">Discharge / Flow Rate</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('discharge')">Clear</button></div>
+    <table class="conv-table" id="tbl-discharge">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">m³/s (cumec)</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">m³/s</td><td class="unit-note">River discharge, design flood</td></tr>
+        <tr><td class="unit-name">m³/min</td><td class="unit-input"><input type="number" data-factor="0.016667" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">m³/min</td><td class="unit-note">Pump output</td></tr>
+        <tr><td class="unit-name">m³/hr</td><td class="unit-input"><input type="number" data-factor="0.000277778" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">m³/hr</td><td class="unit-note">Irrigation supply</td></tr>
+        <tr><td class="unit-name">litre/s (lps)</td><td class="unit-input"><input type="number" data-factor="0.001" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">L/s</td><td class="unit-note">Water supply design (NWSC)</td></tr>
+        <tr><td class="unit-name">litre/min</td><td class="unit-input"><input type="number" data-factor="0.0000166667" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">L/min</td><td class="unit-note">Tap flow rate, pipe sizing</td></tr>
+        <tr><td class="unit-name">litre/hr</td><td class="unit-input"><input type="number" data-factor="2.77778e-7" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">L/hr</td><td class="unit-note">Drip irrigation</td></tr>
+        <tr><td class="unit-name">litre/day</td><td class="unit-input"><input type="number" data-factor="1.15741e-8" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">L/day</td><td class="unit-note">Per capita water demand</td></tr>
+        <tr><td class="unit-name">MLD (ML/day)</td><td class="unit-input"><input type="number" data-factor="0.011574" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">MLD</td><td class="unit-note">Municipal water supply scheme</td></tr>
+        <tr><td class="unit-name">ft³/s (cusec)</td><td class="unit-input"><input type="number" data-factor="0.028317" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">cusec</td><td class="unit-note">Irrigation / river (old NP / DoI)</td></tr>
+        <tr><td class="unit-name">Imperial gal/min (GPM)</td><td class="unit-input"><input type="number" data-factor="0.0000757682" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">GPM</td><td class="unit-note">Pump specifications</td></tr>
+        <tr><td class="unit-name">US gal/min</td><td class="unit-input"><input type="number" data-factor="0.0000630902" oninput="convert(this,'discharge')" placeholder="0"/></td><td class="unit-symbol">USGPM</td><td class="unit-note">—</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ Nepal water supply uses <strong>L/s (lps)</strong> for design. Irrigation uses <strong>cusec (ft³/s)</strong> historically. Hydropower uses <strong>m³/s</strong>. NWSC standard: 100 L/cap/day urban, 45 L/cap/day rural.</div>
+  </div>
+
+  <!-- ══════════════════ TEMPERATURE ══════════════════ -->
+  <div class="cat-panel" id="panel-temp">
+    <div class="section-label">Temperature</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('temp')">Clear</button></div>
+    <table class="conv-table" id="tbl-temp">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Celsius</td><td class="unit-input"><input type="number" id="temp_C" oninput="convertTemp('C')" placeholder="0"/></td><td class="unit-symbol">°C</td><td class="unit-note">Standard NP / IS — concreting temp.</td></tr>
+        <tr><td class="unit-name">Fahrenheit</td><td class="unit-input"><input type="number" id="temp_F" oninput="convertTemp('F')" placeholder="0"/></td><td class="unit-symbol">°F</td><td class="unit-note">Some material specs</td></tr>
+        <tr><td class="unit-name">Kelvin</td><td class="unit-input"><input type="number" id="temp_K" oninput="convertTemp('K')" placeholder="0"/></td><td class="unit-symbol">K</td><td class="unit-note">Thermodynamic calculations</td></tr>
+        <tr><td class="unit-name">Rankine</td><td class="unit-input"><input type="number" id="temp_R" oninput="convertTemp('R')" placeholder="0"/></td><td class="unit-symbol">°R</td><td class="unit-note">—</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ IS 456 specifies concrete shall not be placed when ambient temp &gt;40°C or &lt;5°C. Hot weather concreting: IS 7861-1. Cold weather: IS 7861-2.</div>
+  </div>
+
+  <!-- ══════════════════ DENSITY ══════════════════ -->
+  <div class="cat-panel" id="panel-density">
+    <div class="section-label">Density / Unit Weight</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('density')">Clear</button></div>
+    <table class="conv-table" id="tbl-density">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">kg/m³</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">kg/m³</td><td class="unit-note">Standard — concrete 2400, steel 7850</td></tr>
+        <tr><td class="unit-name">g/cm³</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">g/cm³</td><td class="unit-note">Specific gravity values (lab)</td></tr>
+        <tr><td class="unit-name">g/L</td><td class="unit-input"><input type="number" data-factor="1" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">g/L</td><td class="unit-note">= kg/m³</td></tr>
+        <tr><td class="unit-name">t/m³</td><td class="unit-input"><input type="number" data-factor="1000" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">t/m³</td><td class="unit-note">Soil unit weight (geotechnical)</td></tr>
+        <tr><td class="unit-name">kN/m³</td><td class="unit-input"><input type="number" data-factor="101.9716" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">kN/m³</td><td class="unit-note">Unit weight γ in IS 875 / geotech</td></tr>
+        <tr><td class="unit-name">lb/ft³ (pcf)</td><td class="unit-input"><input type="number" data-factor="16.0185" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">pcf</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">lb/in³</td><td class="unit-input"><input type="number" data-factor="27679.9" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">lb/in³</td><td class="unit-note">—</td></tr>
+        <tr><td class="unit-name">lb/gal (US)</td><td class="unit-input"><input type="number" data-factor="119.826" oninput="convert(this,'density')" placeholder="0"/></td><td class="unit-symbol">lb/gal</td><td class="unit-note">—</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ Common civil engineering unit weights: Water = 1000 kg/m³ (9.81 kN/m³), Concrete = 24 kN/m³, Steel = 78.5 kN/m³, Brick = 19–20 kN/m³, Soil = 16–20 kN/m³.</div>
+  </div>
+
+  <!-- ══════════════════ ANGLE / SLOPE ══════════════════ -->
+  <div class="cat-panel" id="panel-angle">
+    <div class="section-label">Angle / Slope / Gradient</div>
+    <div class="btn-row"><button class="reset-btn" onclick="clearPanel('angle')">Clear</button></div>
+    <table class="conv-table" id="tbl-angle">
+      <thead><tr><th class="unit-name">Unit</th><th class="unit-input">Value</th><th class="unit-symbol">Symbol</th><th class="unit-note">Notes / Context</th></tr></thead>
+      <tbody>
+        <tr><td class="unit-name">Degree</td><td class="unit-input"><input type="number" id="ang_deg" oninput="convertAngle('deg')" placeholder="0"/></td><td class="unit-symbol">°</td><td class="unit-note">Standard angle measurement</td></tr>
+        <tr><td class="unit-name">Radian</td><td class="unit-input"><input type="number" id="ang_rad" oninput="convertAngle('rad')" placeholder="0"/></td><td class="unit-symbol">rad</td><td class="unit-note">SI unit of angle</td></tr>
+        <tr><td class="unit-name">Gradian (Gon)</td><td class="unit-input"><input type="number" id="ang_grad" oninput="convertAngle('grad')" placeholder="0"/></td><td class="unit-symbol">gon</td><td class="unit-note">Surveying — 400 gon = 360°</td></tr>
+        <tr><td class="unit-name">Minute of arc</td><td class="unit-input"><input type="number" id="ang_min" oninput="convertAngle('min')" placeholder="0"/></td><td class="unit-symbol">'</td><td class="unit-note">Theodolite reading (DMS)</td></tr>
+        <tr><td class="unit-name">Second of arc</td><td class="unit-input"><input type="number" id="ang_sec" oninput="convertAngle('sec')" placeholder="0"/></td><td class="unit-symbol">"</td><td class="unit-note">Precise surveying</td></tr>
+        <tr><td class="unit-name">% Slope (rise/run×100)</td><td class="unit-input"><input type="number" id="ang_pct" oninput="convertAngle('pct')" placeholder="0"/></td><td class="unit-symbol">%</td><td class="unit-note">Road gradient (IRC), drain slope</td></tr>
+        <tr><td class="unit-name">1 in N (1:N)</td><td class="unit-input"><input type="number" id="ang_1inN" oninput="convertAngle('1inN')" placeholder="0"/></td><td class="unit-symbol">1:N</td><td class="unit-note">Railway gradient, pipe invert slope</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">ℹ️ IRC road max gradient: 7–10% (plain), up to 12% (hilly). Nepal DoR uses both % and 1:N notation. Surveyors use DMS (Degree-Minute-Second) or Grads on digital theodolites.</div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer class="site-footer">
+  BY Er. Shankar Bhujel &nbsp;·&nbsp; Engineering Tools &nbsp;·&nbsp;
+  <a href="../index.html">← Back to Portfolio</a>
+</footer>
+
+<script>
+// ── Tab switching ──────────────────────────────────────
+function showCat(id) {
+  document.querySelectorAll('.cat-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Generic factor-based converter ─────────────────────
+// All values store in SI base unit (the one with factor=1)
+function convert(changedInput, category) {
+  const val = parseFloat(changedInput.value);
+  if (isNaN(val) || changedInput.value === '') { return; }
+
+  const factor = parseFloat(changedInput.getAttribute('data-factor'));
+  const baseVal = val * factor; // convert to base SI unit
+
+  const panel = document.getElementById('panel-' + category);
+  panel.querySelectorAll('input[data-factor]').forEach(inp => {
+    if (inp === changedInput) {
+      inp.classList.add('origin-input');
+      inp.classList.remove('result-input');
+    } else {
+      const f = parseFloat(inp.getAttribute('data-factor'));
+      const result = baseVal / f;
+      // Show up to 8 significant figures, avoid ugly floats
+      inp.value = parseFloat(result.toPrecision(8));
+      inp.classList.add('result-input');
+      inp.classList.remove('origin-input');
+    }
+  });
+}
+
+function clearPanel(category) {
+  const panel = document.getElementById('panel-' + category);
+  panel.querySelectorAll('input').forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('origin-input', 'result-input');
+  });
+}
+
+// ── Temperature (non-linear) ────────────────────────────
+function convertTemp(from) {
+  let C, F, K, R;
+  const v = parseFloat(document.getElementById('temp_' + from).value);
+  if (isNaN(v)) return;
+
+  if (from === 'C') { C = v; F = C * 9/5 + 32; K = C + 273.15; R = (C + 273.15) * 9/5; }
+  else if (from === 'F') { F = v; C = (F - 32) * 5/9; K = C + 273.15; R = F + 459.67; }
+  else if (from === 'K') { K = v; C = K - 273.15; F = C * 9/5 + 32; R = K * 9/5; }
+  else if (from === 'R') { R = v; K = R * 5/9; C = K - 273.15; F = C * 9/5 + 32; }
+
+  const vals = { C, F, K, R };
+  ['C','F','K','R'].forEach(u => {
+    const el = document.getElementById('temp_' + u);
+    if (u !== from) {
+      el.value = parseFloat(vals[u].toPrecision(8));
+      el.classList.add('result-input'); el.classList.remove('origin-input');
+    } else {
+      el.classList.add('origin-input'); el.classList.remove('result-input');
+    }
+  });
+}
+
+// ── Angle / Slope (non-linear for some) ────────────────
+function convertAngle(from) {
+  let deg;
+  const v = parseFloat(document.getElementById('ang_' + from).value);
+  if (isNaN(v)) return;
+
+  if      (from === 'deg')  { deg = v; }
+  else if (from === 'rad')  { deg = v * 180 / Math.PI; }
+  else if (from === 'grad') { deg = v * 0.9; }
+  else if (from === 'min')  { deg = v / 60; }
+  else if (from === 'sec')  { deg = v / 3600; }
+  else if (from === 'pct')  { deg = Math.atan(v / 100) * 180 / Math.PI; }
+  else if (from === '1inN') { deg = Math.atan(1 / v) * 180 / Math.PI; }
+
+  const vals = {
+    deg:  deg,
+    rad:  deg * Math.PI / 180,
+    grad: deg / 0.9,
+    min:  deg * 60,
+    sec:  deg * 3600,
+    pct:  Math.tan(deg * Math.PI / 180) * 100,
+    '1inN': 1 / Math.tan(deg * Math.PI / 180)
+  };
+
+  Object.keys(vals).forEach(u => {
+    const el = document.getElementById('ang_' + u);
+    if (!el) return;
+    if (u !== from) {
+      el.value = parseFloat(vals[u].toPrecision(8));
+      el.classList.add('result-input'); el.classList.remove('origin-input');
+    } else {
+      el.classList.add('origin-input'); el.classList.remove('result-input');
+    }
+  });
+}
+</script>
+</body>
+</html>
