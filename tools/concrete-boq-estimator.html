@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concrete Work Quantity & Cost Estimator — BY Er. Shankar Bhujel</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --surface2: #e8e8e8;
+      --border: #bdbdbd;
+      --border-dark: #9e9e9e;
+      --accent: #1565C0;
+      --output: #2E7D32;
+      --text: #212121;
+      --muted: #616161;
+      --header-bg: #1565C0;
+      --header-text: #ffffff;
+      --row-alt: #f9f9f9;
+      --warn: #b71c1c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    /* ── HEADER ── */
+    .site-header { background: var(--header-bg); color: var(--header-text); padding: 0.6rem 1.5rem; }
+    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .header-by { font-size: 1rem; font-weight: bold; letter-spacing: 0.03em; }
+    .header-tool-name { font-size: 0.82rem; opacity: 0.85; }
+
+    /* ── NAV ── */
+    .main-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.45rem 1.5rem; font-size: 0.82rem; }
+    .main-nav a { color: var(--accent); text-decoration: none; margin-right: 1.5rem; }
+    .main-nav a:hover { text-decoration: underline; }
+
+    /* ── PAGE TITLE ── */
+    .page-title { max-width: 980px; margin: 1rem auto 0.75rem; padding: 0 1.5rem 0.6rem; border-bottom: 2px solid var(--accent); }
+    .page-title h1 { font-size: 1.25rem; color: var(--accent); margin-bottom: 0.2rem; }
+    .page-title p { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── WRAPPER ── */
+    .wrapper { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 2rem; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.72rem; font-weight: bold; color: var(--header-bg);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      background: var(--surface2); border: 1px solid var(--border); border-bottom: none;
+      padding: 0.3rem 0.75rem; display: inline-block; margin-top: 1rem;
+    }
+
+    /* ── TABLES ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    table th {
+      background: var(--accent); color: #fff; text-align: left;
+      padding: 0.4rem 0.75rem; font-size: 0.75rem; letter-spacing: 0.04em;
+      font-weight: bold; border: 1px solid #0d47a1;
+    }
+    table td { border: 1px solid var(--border); padding: 0.3rem 0.6rem; background: var(--bg); vertical-align: middle; }
+    table tr:nth-child(even) td { background: var(--row-alt); }
+    .param-label { width: 42%; font-weight: 500; color: var(--text); }
+    .param-input { width: 38%; }
+    .param-unit  { width: 20%; color: var(--muted); font-size: 0.8rem; }
+
+    input[type="number"], select {
+      width: 100%; border: 1px solid var(--border-dark);
+      padding: 0.28rem 0.5rem; font-family: Arial, sans-serif;
+      font-size: 0.88rem; background: #fff; color: var(--text); outline: none;
+    }
+    input[type="number"]:focus, select:focus { border-color: var(--accent); outline: 1px solid var(--accent); }
+
+    /* ── OUTPUT TABLE ── */
+    .output-table th { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .result-value { font-weight: bold; color: var(--output); font-family: 'Courier New', monospace; font-size: 0.92rem; }
+    .result-total { font-weight: bold; color: var(--warn); font-family: 'Courier New', monospace; font-size: 1rem; }
+
+    /* ── BUTTONS ── */
+    .btn-row { margin: 0.75rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .calc-btn { background: var(--accent); color: #fff; border: none; padding: 0.45rem 1.6rem; font-size: 0.88rem; font-family: Arial, sans-serif; cursor: pointer; font-weight: bold; }
+    .calc-btn:hover { background: #0d47a1; }
+    .reset-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border-dark); padding: 0.45rem 1.2rem; font-size: 0.88rem; font-family: Arial, sans-serif; cursor: pointer; }
+    .reset-btn:hover { background: #ddd; }
+
+    /* ── FORMULA BOX ── */
+    .formula-box { background: #fffde7; border: 1px solid #f9a825; padding: 0.6rem 1rem; font-size: 0.8rem; font-family: 'Courier New', monospace; color: #5d4037; line-height: 1.7; margin-top: 0; }
+    .formula-box strong { font-family: Arial, sans-serif; font-size: 0.78rem; }
+
+    /* ── NOTE BOX ── */
+    .note-box { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 0.55rem 1rem; font-size: 0.8rem; color: #1b5e20; margin-top: 0.5rem; line-height: 1.6; }
+
+    /* ── TWO COLUMN LAYOUT ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 0; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── SUMMARY CARDS ── */
+    .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem; margin-top: 0.5rem; }
+    @media (max-width: 640px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
+    .summary-card { border: 1px solid var(--border); padding: 0.6rem 0.75rem; background: var(--surface); text-align: center; }
+    .summary-card .sc-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .summary-card .sc-value { font-size: 1.05rem; font-weight: bold; color: var(--output); font-family: 'Courier New', monospace; }
+    .summary-card .sc-unit  { font-size: 0.72rem; color: var(--muted); }
+    .summary-card.total .sc-value { color: var(--warn); font-size: 1.1rem; }
+
+    /* ── FOOTER ── */
+    .site-footer { max-width: 980px; margin: 2rem auto 0; padding: 0.75rem 1.5rem; border-top: 1px solid var(--border); font-size: 0.76rem; color: var(--muted); }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <span class="header-by">BY Er. Shankar Bhujel</span>
+    <span class="header-tool-name">Concrete Work Quantity &amp; Cost Estimator</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <a href="../index.html">← Portfolio</a>
+  <a href="index.html">Tools Index</a>
+</nav>
+
+<!-- PAGE TITLE -->
+<div class="page-title">
+  <h1>Concrete Work Quantity &amp; Cost Estimator</h1>
+  <p>Calculates volume of concrete, cement bags, sand, aggregate, water, reinforcement steel and total cost for any RCC/PCC member</p>
+</div>
+
+<div class="wrapper">
+
+  <!-- ══════════════════════════════════════
+       SECTION 1 — CONCRETE MEMBER DIMENSIONS
+  ══════════════════════════════════════ -->
+  <div class="section-label">1. Concrete Member Dimensions</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Member Type &amp; Geometry</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Member Type</td>
+          <td class="param-input">
+            <select id="memberType" onchange="onMemberChange()">
+              <option value="slab">Slab (Flat)</option>
+              <option value="beam">Beam / Lintel</option>
+              <option value="column">Column (Rectangular)</option>
+              <option value="column_circ">Column (Circular)</option>
+              <option value="footing_rect">Footing (Rectangular/Isolated)</option>
+              <option value="footing_strip">Footing (Strip / Wall)</option>
+              <option value="staircase">Staircase Waist Slab</option>
+              <option value="retwall">Retaining Wall / Shear Wall</option>
+              <option value="custom">Custom / General Volume</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+
+        <!-- SLAB / BEAM / WALL rows -->
+        <tr id="row_L">
+          <td class="param-label" id="lbl_L">Length (L)</td>
+          <td class="param-input"><input type="number" id="dimL" value="5.0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr id="row_B">
+          <td class="param-label" id="lbl_B">Width / Breadth (B)</td>
+          <td class="param-input"><input type="number" id="dimB" value="4.0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr id="row_D">
+          <td class="param-label" id="lbl_D">Depth / Thickness (D)</td>
+          <td class="param-input"><input type="number" id="dimD" value="0.15" min="0" step="0.001"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <!-- Circular column diameter -->
+        <tr id="row_dia" style="display:none;">
+          <td class="param-label">Diameter</td>
+          <td class="param-input"><input type="number" id="dimDia" value="0.45" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <!-- Staircase extra -->
+        <tr id="row_rise" style="display:none;">
+          <td class="param-label">Number of Steps</td>
+          <td class="param-input"><input type="number" id="numSteps" value="14" min="1" step="1"/></td>
+          <td class="param-unit">nos</td>
+        </tr>
+        <tr id="row_tread" style="display:none;">
+          <td class="param-label">Tread Width</td>
+          <td class="param-input"><input type="number" id="treadW" value="0.28" min="0.1" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr id="row_riserH" style="display:none;">
+          <td class="param-label">Riser Height</td>
+          <td class="param-input"><input type="number" id="riserH" value="0.17" min="0.05" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+
+        <tr>
+          <td class="param-label">Number of Members</td>
+          <td class="param-input"><input type="number" id="numMembers" value="1" min="1" step="1"/></td>
+          <td class="param-unit">nos</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <thead><tr><th colspan="3">Deductions (Openings / Voids)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Opening / Void 1 — Length</td>
+          <td class="param-input"><input type="number" id="op1L" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">Opening / Void 1 — Width</td>
+          <td class="param-input"><input type="number" id="op1B" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">Opening / Void 1 — Depth</td>
+          <td class="param-input"><input type="number" id="op1D" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">No. of Opening / Void 1</td>
+          <td class="param-input"><input type="number" id="op1N" value="0" min="0" step="1"/></td>
+          <td class="param-unit">nos</td>
+        </tr>
+        <tr>
+          <td class="param-label">Opening / Void 2 — Length</td>
+          <td class="param-input"><input type="number" id="op2L" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">Opening / Void 2 — Width</td>
+          <td class="param-input"><input type="number" id="op2B" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">Opening / Void 2 — Depth</td>
+          <td class="param-input"><input type="number" id="op2D" value="0" min="0" step="0.01"/></td>
+          <td class="param-unit">m</td>
+        </tr>
+        <tr>
+          <td class="param-label">No. of Opening / Void 2</td>
+          <td class="param-input"><input type="number" id="op2N" value="0" min="0" step="1"/></td>
+          <td class="param-unit">nos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2 — MIX DESIGN & MATERIAL SPECS
+  ══════════════════════════════════════ -->
+  <div class="section-label">2. Mix Design &amp; Material Specifications</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Concrete Mix</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Concrete Grade</td>
+          <td class="param-input">
+            <select id="grade" onchange="onGradeChange()">
+              <option value="M10">M10 (PCC)</option>
+              <option value="M15">M15 (PCC)</option>
+              <option value="M20" selected>M20 (RCC)</option>
+              <option value="M25">M25 (RCC)</option>
+              <option value="M30">M30 (RCC)</option>
+              <option value="M35">M35</option>
+              <option value="M40">M40</option>
+              <option value="custom">Custom Ratio</option>
+            </select>
+          </td>
+          <td class="param-unit">IS 456</td>
+        </tr>
+        <tr id="row_customRatio" style="display:none;">
+          <td class="param-label">Custom Mix Ratio (C:FA:CA)</td>
+          <td class="param-input" colspan="2" style="display:flex;gap:4px;padding:0.3rem 0.6rem;">
+            <input type="number" id="ratioC"  value="1"  min="1" step="0.5" style="width:30%;" title="Cement parts"/>
+            <span style="padding:0.3rem 0.2rem;color:var(--muted);">:</span>
+            <input type="number" id="ratioFA" value="1.5" min="0.5" step="0.5" style="width:30%;" title="FA parts"/>
+            <span style="padding:0.3rem 0.2rem;color:var(--muted);">:</span>
+            <input type="number" id="ratioCA" value="3"  min="1" step="0.5" style="width:30%;" title="CA parts"/>
+          </td>
+        </tr>
+        <tr>
+          <td class="param-label">Mix Ratio (auto C:FA:CA)</td>
+          <td class="result-value" id="r_ratio" style="border:1px solid var(--border);padding:0.3rem 0.6rem;background:#f9f9f9;">—</td>
+          <td class="param-unit">nominal</td>
+        </tr>
+        <tr>
+          <td class="param-label">Type of Concrete</td>
+          <td class="param-input">
+            <select id="concreteType">
+              <option value="RCC">RCC (Reinforced)</option>
+              <option value="PCC">PCC (Plain)</option>
+            </select>
+          </td>
+          <td class="param-unit">—</td>
+        </tr>
+        <tr>
+          <td class="param-label">Wastage / Bulking Factor</td>
+          <td class="param-input"><input type="number" id="wastage" value="2" min="0" max="20" step="0.5"/></td>
+          <td class="param-unit">% extra volume</td>
+        </tr>
+        <tr>
+          <td class="param-label">Dry Volume Factor</td>
+          <td class="param-input"><input type="number" id="dryFactor" value="1.54" min="1.3" max="1.7" step="0.01"/></td>
+          <td class="param-unit">— (IS: 1.54)</td>
+        </tr>
+        <tr>
+          <td class="param-label">Bag Size of Cement</td>
+          <td class="param-input">
+            <select id="bagSize">
+              <option value="50" selected>50 kg (standard)</option>
+              <option value="25">25 kg</option>
+            </select>
+          </td>
+          <td class="param-unit">kg/bag</td>
+        </tr>
+        <tr>
+          <td class="param-label">Density of Concrete</td>
+          <td class="param-input"><input type="number" id="concDensity" value="2400" min="2000" max="2600" step="10"/></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <thead><tr><th colspan="3">Reinforcement Steel (RCC only)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Steel Percentage in Concrete</td>
+          <td class="param-input"><input type="number" id="steelPct" value="1.0" min="0" max="8" step="0.1"/></td>
+          <td class="param-unit">% of volume</td>
+        </tr>
+        <tr>
+          <td class="param-label">Density of Steel</td>
+          <td class="param-input"><input type="number" id="steelDensity" value="7850" min="7700" max="8000" step="10"/></td>
+          <td class="param-unit">kg/m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Steel Wastage</td>
+          <td class="param-input"><input type="number" id="steelWastage" value="5" min="0" max="15" step="0.5"/></td>
+          <td class="param-unit">%</td>
+        </tr>
+        <tr>
+          <td class="param-label">Shuttering / Formwork Area</td>
+          <td class="param-input"><input type="number" id="shutter" value="0" min="0" step="0.1"/></td>
+          <td class="param-unit">m² (if known)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 3 — MATERIAL RATES
+  ══════════════════════════════════════ -->
+  <div class="section-label">3. Material &amp; Labour Rates</div>
+  <div class="two-col">
+    <table>
+      <thead><tr><th colspan="3">Material Rates</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Cement Cost</td>
+          <td class="param-input"><input type="number" id="costCement" value="900" min="0" step="1"/></td>
+          <td class="param-unit">NPR / bag</td>
+        </tr>
+        <tr>
+          <td class="param-label">Sand (FA) Cost</td>
+          <td class="param-input"><input type="number" id="costSand" value="2500" min="0" step="1"/></td>
+          <td class="param-unit">NPR / m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Aggregate (CA) Cost</td>
+          <td class="param-input"><input type="number" id="costAgg" value="3000" min="0" step="1"/></td>
+          <td class="param-unit">NPR / m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Water Cost</td>
+          <td class="param-input"><input type="number" id="costWater" value="5" min="0" step="0.5"/></td>
+          <td class="param-unit">NPR / litre</td>
+        </tr>
+        <tr>
+          <td class="param-label">Steel (Rebar) Cost</td>
+          <td class="param-input"><input type="number" id="costSteel" value="120" min="0" step="1"/></td>
+          <td class="param-unit">NPR / kg</td>
+        </tr>
+        <tr>
+          <td class="param-label">Admixture Cost</td>
+          <td class="param-input"><input type="number" id="costAdmixture" value="0" min="0" step="1"/></td>
+          <td class="param-unit">NPR / litre</td>
+        </tr>
+        <tr>
+          <td class="param-label">Admixture Dosage</td>
+          <td class="param-input"><input type="number" id="admixDose" value="0" min="0" max="5" step="0.1"/></td>
+          <td class="param-unit">litre / m³ conc.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <thead><tr><th colspan="3">Labour Rates</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="param-label">Concrete Mixing &amp; Placing Labour</td>
+          <td class="param-input"><input type="number" id="labourConc" value="1800" min="0" step="10"/></td>
+          <td class="param-unit">NPR / m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Steel Bar Bending &amp; Binding</td>
+          <td class="param-input"><input type="number" id="labourSteel" value="15" min="0" step="1"/></td>
+          <td class="param-unit">NPR / kg</td>
+        </tr>
+        <tr>
+          <td class="param-label">Formwork / Shuttering Labour</td>
+          <td class="param-input"><input type="number" id="labourShutter" value="350" min="0" step="10"/></td>
+          <td class="param-unit">NPR / m²</td>
+        </tr>
+        <tr>
+          <td class="param-label">Curing Labour</td>
+          <td class="param-input"><input type="number" id="labourCuring" value="200" min="0" step="10"/></td>
+          <td class="param-unit">NPR / m³</td>
+        </tr>
+        <tr>
+          <td class="param-label">Contractor Overhead &amp; Profit</td>
+          <td class="param-input"><input type="number" id="overhead" value="15" min="0" max="50" step="0.5"/></td>
+          <td class="param-unit">% of direct cost</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Collapsible formulas -->
+  <div style="margin-top:0.5rem;">
+    <button onclick="toggleFormula()" id="formulaToggleBtn"
+      style="background:none;border:1px solid #f9a825;color:#5d4037;font-size:0.78rem;font-family:Arial,sans-serif;padding:0.25rem 0.75rem;cursor:pointer;">
+      ▶ Show Formulas Used
+    </button>
+    <div id="formulaBox" class="formula-box" style="display:none;">
+      <strong>Formulas used:</strong><br>
+      Gross Volume  = L × B × D (or π/4 × D² × H for circular) × No. of members<br>
+      Deduction Vol = (op1L×op1B×op1D×N1) + (op2L×op2B×op2D×N2)<br>
+      Net Volume    = Gross Volume − Deductions<br>
+      Design Volume = Net Volume × (1 + wastage%/100)<br>
+      Dry Volume    = Design Volume × Dry Volume Factor (IS: 1.54)<br>
+      <br>
+      Total parts   = C + FA + CA  (from mix ratio)<br>
+      Cement Vol    = Dry Volume × C / Total parts  (m³)<br>
+      Cement (bags) = (Cement Vol × 1440) / bag size kg<br>
+      Sand (FA) Vol = Dry Volume × FA / Total parts  (m³)<br>
+      Aggr (CA) Vol = Dry Volume × CA / Total parts  (m³)<br>
+      Water (litres) = 0.45 × Cement mass  (w/c = 0.45)<br>
+      <br>
+      Steel mass    = Net Volume × (steel%/100) × steel density × (1 + steel wastage%/100)<br>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-row">
+    <button class="calc-btn" onclick="calculate()">Calculate</button>
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 4 — RESULTS
+  ══════════════════════════════════════ -->
+  <div class="section-label">4. Results</div>
+
+  <!-- Summary cards -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="sc-label">Net Volume</div>
+      <div class="sc-value" id="sc_vol">—</div>
+      <div class="sc-unit">m³</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Cement</div>
+      <div class="sc-value" id="sc_cement">—</div>
+      <div class="sc-unit">bags</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Steel</div>
+      <div class="sc-value" id="sc_steel">—</div>
+      <div class="sc-unit">kg</div>
+    </div>
+    <div class="summary-card total">
+      <div class="sc-label">Total Cost</div>
+      <div class="sc-value" id="sc_total">—</div>
+      <div class="sc-unit">NPR</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:0.75rem;">
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="3">Quantity Summary</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Gross Volume</td>
+            <td class="result-value" id="r_grossVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Deduction Volume</td>
+            <td class="result-value" id="r_dedVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Net Concrete Volume</td>
+            <td class="result-value" id="r_netVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Design Volume (with wastage)</td>
+            <td class="result-value" id="r_designVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Dry Volume</td>
+            <td class="result-value" id="r_dryVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Volume</td>
+            <td class="result-value" id="r_cementVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Required</td>
+            <td class="result-value" id="r_cementBags">—</td>
+            <td class="param-unit">bags</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Mass</td>
+            <td class="result-value" id="r_cementKg">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Sand (FA) Volume</td>
+            <td class="result-value" id="r_sandVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Sand (FA) Mass</td>
+            <td class="result-value" id="r_sandKg">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Aggregate (CA) Volume</td>
+            <td class="result-value" id="r_aggVol">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Aggregate (CA) Mass</td>
+            <td class="result-value" id="r_aggKg">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Water Required</td>
+            <td class="result-value" id="r_water">—</td>
+            <td class="param-unit">litres</td>
+          </tr>
+          <tr>
+            <td class="param-label">Admixture Required</td>
+            <td class="result-value" id="r_admix">—</td>
+            <td class="param-unit">litres</td>
+          </tr>
+          <tr>
+            <td class="param-label">Reinforcement Steel</td>
+            <td class="result-value" id="r_steel">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+          <tr>
+            <td class="param-label">Total Concrete Mass</td>
+            <td class="result-value" id="r_concMass">—</td>
+            <td class="param-unit">kg</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="2">Cost Breakdown</th></tr></thead>
+        <tbody>
+          <tr><td class="param-label">Cement Cost</td><td class="result-value" id="r_costCement">—</td></tr>
+          <tr><td class="param-label">Sand Cost</td><td class="result-value" id="r_costSand">—</td></tr>
+          <tr><td class="param-label">Aggregate Cost</td><td class="result-value" id="r_costAgg">—</td></tr>
+          <tr><td class="param-label">Water Cost</td><td class="result-value" id="r_costWater">—</td></tr>
+          <tr><td class="param-label">Admixture Cost</td><td class="result-value" id="r_costAdmix">—</td></tr>
+          <tr><td class="param-label">Steel Cost</td><td class="result-value" id="r_costSteel">—</td></tr>
+          <tr><td class="param-label">Concreting Labour</td><td class="result-value" id="r_costLabourConc">—</td></tr>
+          <tr><td class="param-label">Steel Labour</td><td class="result-value" id="r_costLabourSteel">—</td></tr>
+          <tr><td class="param-label">Formwork Labour</td><td class="result-value" id="r_costLabourShutter">—</td></tr>
+          <tr><td class="param-label">Curing Labour</td><td class="result-value" id="r_costCuring">—</td></tr>
+          <tr>
+            <td style="font-weight:bold;border:1px solid var(--border);padding:0.3rem 0.6rem;">Direct Cost Sub-total</td>
+            <td class="result-value" id="r_directCost">—</td>
+          </tr>
+          <tr><td class="param-label">Overhead &amp; Profit</td><td class="result-value" id="r_overhead">—</td></tr>
+          <tr>
+            <td style="font-weight:bold;border:1px solid var(--border);padding:0.3rem 0.6rem;">TOTAL COST</td>
+            <td class="result-total" id="r_totalCost">—</td>
+          </tr>
+          <tr><td class="param-label">Cost per m³</td><td class="result-value" id="r_costPerM3">—</td></tr>
+          <tr><td class="param-label">Cost per m²</td><td class="result-value" id="r_costPerM2">—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-box" style="margin-top:0.75rem;">
+        ℹ️ Dry volume factor = 1.54 accounts for voids &amp; compaction (IS standard).<br>
+        Steel % by volume: Slab 0.7–1.2%, Beam 1–2%, Column 1–4% (IS 456).<br>
+        All costs in Nepalese Rupees (NPR). Adjust rates for your region.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer class="site-footer">
+  BY Er. Shankar Bhujel &nbsp;·&nbsp; Engineering Tools &nbsp;·&nbsp;
+  <a href="../index.html">← Back to Portfolio</a>
+</footer>
+
+<script>
+// ── Mix ratio table (nominal mixes per IS 456) ──────────
+const MIX_RATIOS = {
+  M10:  { c:1, fa:3,   ca:6   },
+  M15:  { c:1, fa:2,   ca:4   },
+  M20:  { c:1, fa:1.5, ca:3   },
+  M25:  { c:1, fa:1,   ca:2   },
+  M30:  { c:1, fa:1,   ca:2   },  // Design mix but nominal approx
+  M35:  { c:1, fa:0.75,ca:1.5 },
+  M40:  { c:1, fa:0.75,ca:1.5 },
+  custom: null
+};
+
+// Density of FA and CA (kg/m³, approximate)
+const D_FA  = 1600;
+const D_CA  = 1500;
+const D_CEM = 1440;
+
+function fmt(n, d=2)  { return isFinite(n) ? Number(n).toFixed(d) : '—'; }
+function fmtCur(n)    { return 'NPR ' + Number(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function set(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+function get(id)      { return parseFloat(document.getElementById(id).value) || 0; }
+
+// ── Member type change: toggle dimension labels/rows ────
+function onMemberChange() {
+  const type = document.getElementById('memberType').value;
+
+  // Show/hide rows
+  const showDia   = type === 'column_circ';
+  const showStair = type === 'staircase';
+
+  document.getElementById('row_dia').style.display    = showDia   ? '' : 'none';
+  document.getElementById('row_rise').style.display   = showStair ? '' : 'none';
+  document.getElementById('row_tread').style.display  = showStair ? '' : 'none';
+  document.getElementById('row_riserH').style.display = showStair ? '' : 'none';
+
+  // Update labels
+  const lblL = document.getElementById('lbl_L');
+  const lblB = document.getElementById('lbl_B');
+  const lblD = document.getElementById('lbl_D');
+
+  if (type === 'column' || type === 'column_circ') {
+    lblL.textContent = 'Height (H)';
+    lblB.textContent = 'Width (b)';
+    lblD.textContent = 'Depth (d)';
+    document.getElementById('row_B').style.display = type === 'column_circ' ? 'none' : '';
+    document.getElementById('row_D').style.display = type === 'column_circ' ? 'none' : '';
+  } else if (type === 'beam') {
+    lblL.textContent = 'Span Length (L)';
+    lblB.textContent = 'Beam Width (bw)';
+    lblD.textContent = 'Overall Depth (D)';
+    document.getElementById('row_B').style.display = '';
+    document.getElementById('row_D').style.display = '';
+  } else if (type === 'slab') {
+    lblL.textContent = 'Length (L)';
+    lblB.textContent = 'Width (B)';
+    lblD.textContent = 'Slab Thickness (D)';
+    document.getElementById('row_B').style.display = '';
+    document.getElementById('row_D').style.display = '';
+  } else if (type === 'footing_strip') {
+    lblL.textContent = 'Length of Strip (L)';
+    lblB.textContent = 'Footing Width (B)';
+    lblD.textContent = 'Footing Depth (D)';
+    document.getElementById('row_B').style.display = '';
+    document.getElementById('row_D').style.display = '';
+  } else {
+    lblL.textContent = 'Length (L)';
+    lblB.textContent = 'Width / Breadth (B)';
+    lblD.textContent = 'Depth / Thickness (D)';
+    document.getElementById('row_B').style.display = '';
+    document.getElementById('row_D').style.display = '';
+  }
+}
+
+// ── Grade change: show/hide custom ratio row ────────────
+function onGradeChange() {
+  const grade = document.getElementById('grade').value;
+  const isCustom = grade === 'custom';
+  document.getElementById('row_customRatio').style.display = isCustom ? '' : 'none';
+
+  if (!isCustom && MIX_RATIOS[grade]) {
+    const r = MIX_RATIOS[grade];
+    set('r_ratio', `1 : ${r.fa} : ${r.ca}`);
+  } else if (isCustom) {
+    set('r_ratio', 'User defined');
+  }
+}
+
+// ── Main calculation ─────────────────────────────────────
+function calculate() {
+  const type      = document.getElementById('memberType').value;
+  const nMembers  = get('numMembers') || 1;
+
+  // ── Gross Volume ──
+  let grossVol = 0;
+  if (type === 'column_circ') {
+    const H   = get('dimL');
+    const dia = get('dimDia');
+    grossVol = Math.PI / 4 * dia * dia * H * nMembers;
+  } else if (type === 'staircase') {
+    const width   = get('dimL');   // stair width
+    const waistD  = get('dimD');   // waist slab thickness
+    const nSteps  = get('numSteps');
+    const tread   = get('treadW');
+    const riser   = get('riserH');
+    // Waist slab volume + steps solid volume
+    const slantL  = Math.sqrt(tread * tread + riser * riser);
+    const totalRun = nSteps * tread;
+    const waistVol = totalRun * width * waistD / Math.cos(Math.atan(riser / tread));
+    const stepVol  = 0.5 * tread * riser * width * nSteps;
+    grossVol = (waistVol + stepVol) * nMembers;
+  } else {
+    const L = get('dimL');
+    const B = get('dimB');
+    const D = get('dimD');
+    grossVol = L * B * D * nMembers;
+  }
+
+  // ── Deductions ──
+  const dedVol = (get('op1L') * get('op1B') * get('op1D') * (get('op1N') || 0))
+               + (get('op2L') * get('op2B') * get('op2D') * (get('op2N') || 0));
+
+  const netVol    = Math.max(0, grossVol - dedVol);
+  const wastage   = get('wastage') / 100;
+  const designVol = netVol * (1 + wastage);
+  const dryFactor = get('dryFactor');
+  const dryVol    = designVol * dryFactor;
+
+  // ── Mix ratio ──
+  const grade = document.getElementById('grade').value;
+  let rC, rFA, rCA;
+  if (grade === 'custom') {
+    rC  = get('ratioC')  || 1;
+    rFA = get('ratioFA') || 1.5;
+    rCA = get('ratioCA') || 3;
+  } else {
+    const r = MIX_RATIOS[grade] || MIX_RATIOS.M20;
+    rC = r.c; rFA = r.fa; rCA = r.ca;
+  }
+  const totalParts = rC + rFA + rCA;
+
+  // ── Material quantities ──
+  const cementVol  = dryVol * (rC  / totalParts);   // m³
+  const sandVol    = dryVol * (rFA / totalParts);    // m³
+  const aggVol     = dryVol * (rCA / totalParts);    // m³
+
+  const cementKg   = cementVol * D_CEM;             // kg
+  const bagSize    = parseFloat(document.getElementById('bagSize').value);
+  const cementBags = cementKg / bagSize;
+
+  const sandKg     = sandVol * D_FA;
+  const aggKg      = aggVol  * D_CA;
+
+  const waterLitres = 0.45 * cementKg;             // w/c = 0.45 approx
+
+  const admixDose   = get('admixDose');
+  const admixLitres = admixDose * designVol;
+
+  // ── Steel ──
+  const concreteTypeVal = document.getElementById('concreteType').value;
+  const steelPct    = concreteTypeVal === 'RCC' ? get('steelPct') / 100 : 0;
+  const steelDens   = get('steelDensity');
+  const steelWaste  = get('steelWastage') / 100;
+  const steelKg     = netVol * steelPct * steelDens * (1 + steelWaste);
+
+  const concMass    = designVol * get('concDensity');
+
+  // ── Costs ──
+  const cCostCement  = Math.ceil(cementBags) * get('costCement');
+  const cCostSand    = sandVol   * get('costSand');
+  const cCostAgg     = aggVol    * get('costAgg');
+  const cCostWater   = waterLitres * get('costWater');
+  const cCostAdmix   = admixLitres * get('costAdmixture');
+  const cCostSteel   = steelKg   * get('costSteel');
+  const cLabConc     = designVol  * get('labourConc');
+  const cLabSteel    = steelKg   * get('labourSteel');
+  const shutterArea  = get('shutter');
+  const cLabShutter  = shutterArea * get('labourShutter');
+  const cLabCuring   = designVol  * get('labourCuring');
+
+  const directCost   = cCostCement + cCostSand + cCostAgg + cCostWater +
+                       cCostAdmix  + cCostSteel + cLabConc + cLabSteel +
+                       cLabShutter + cLabCuring;
+
+  const overheadAmt  = directCost * (get('overhead') / 100);
+  const totalCost    = directCost + overheadAmt;
+  const costPerM3    = designVol > 0 ? totalCost / designVol : 0;
+
+  // Surface area for per m² cost (relevant for slab)
+  const surfaceArea  = type === 'column_circ'
+    ? Math.PI / 4 * get('dimDia') * get('dimDia')
+    : get('dimL') * get('dimB');
+  const costPerM2    = surfaceArea > 0 ? totalCost / (surfaceArea * nMembers) : 0;
+
+  // ── Display quantities ──
+  set('r_grossVol',   fmt(grossVol)   + ' m³');
+  set('r_dedVol',     fmt(dedVol)     + ' m³');
+  set('r_netVol',     fmt(netVol)     + ' m³');
+  set('r_designVol',  fmt(designVol)  + ' m³');
+  set('r_dryVol',     fmt(dryVol)     + ' m³');
+  set('r_cementVol',  fmt(cementVol)  + ' m³');
+  set('r_cementBags', fmt(cementBags, 1) + ' bags (' + Math.ceil(cementBags) + ' bags ordered)');
+  set('r_cementKg',   fmt(cementKg)   + ' kg');
+  set('r_sandVol',    fmt(sandVol)    + ' m³');
+  set('r_sandKg',     fmt(sandKg)     + ' kg');
+  set('r_aggVol',     fmt(aggVol)     + ' m³');
+  set('r_aggKg',      fmt(aggKg)      + ' kg');
+  set('r_water',      fmt(waterLitres) + ' L');
+  set('r_admix',      admixDose > 0 ? fmt(admixLitres, 2) + ' L' : 'Not used');
+  set('r_steel',      concreteTypeVal === 'RCC' ? fmt(steelKg) + ' kg' : 'PCC — N/A');
+  set('r_concMass',   fmt(concMass)   + ' kg');
+
+  // ── Display costs ──
+  set('r_costCement',       fmtCur(cCostCement));
+  set('r_costSand',         fmtCur(cCostSand));
+  set('r_costAgg',          fmtCur(cCostAgg));
+  set('r_costWater',        fmtCur(cCostWater));
+  set('r_costAdmix',        fmtCur(cCostAdmix));
+  set('r_costSteel',        fmtCur(cCostSteel));
+  set('r_costLabourConc',   fmtCur(cLabConc));
+  set('r_costLabourSteel',  fmtCur(cLabSteel));
+  set('r_costLabourShutter',fmtCur(cLabShutter));
+  set('r_costCuring',       fmtCur(cLabCuring));
+  set('r_directCost',       fmtCur(directCost));
+  set('r_overhead',         fmtCur(overheadAmt));
+  set('r_totalCost',        fmtCur(totalCost));
+  set('r_costPerM3',        fmtCur(costPerM3) + ' / m³');
+  set('r_costPerM2',        surfaceArea > 0 ? fmtCur(costPerM2) + ' / m²' : '—');
+
+  // ── Display mix ratio ──
+  set('r_ratio', `1 : ${rFA} : ${rCA}`);
+
+  // ── Summary cards ──
+  set('sc_vol',    fmt(netVol));
+  set('sc_cement', Math.ceil(cementBags));
+  set('sc_steel',  concreteTypeVal === 'RCC' ? fmt(steelKg) : 'N/A');
+  set('sc_total',  fmtCur(totalCost).replace('NPR ',''));
+}
+
+function resetForm() {
+  document.getElementById('memberType').value  = 'slab';
+  document.getElementById('dimL').value        = 5.0;
+  document.getElementById('dimB').value        = 4.0;
+  document.getElementById('dimD').value        = 0.15;
+  document.getElementById('dimDia').value      = 0.45;
+  document.getElementById('numSteps').value    = 14;
+  document.getElementById('treadW').value      = 0.28;
+  document.getElementById('riserH').value      = 0.17;
+  document.getElementById('numMembers').value  = 1;
+  document.getElementById('op1L').value = 0; document.getElementById('op1B').value = 0;
+  document.getElementById('op1D').value = 0; document.getElementById('op1N').value = 0;
+  document.getElementById('op2L').value = 0; document.getElementById('op2B').value = 0;
+  document.getElementById('op2D').value = 0; document.getElementById('op2N').value = 0;
+  document.getElementById('grade').value       = 'M20';
+  document.getElementById('concreteType').value= 'RCC';
+  document.getElementById('wastage').value     = 2;
+  document.getElementById('dryFactor').value   = 1.54;
+  document.getElementById('bagSize').value     = '50';
+  document.getElementById('concDensity').value = 2400;
+  document.getElementById('steelPct').value    = 1.0;
+  document.getElementById('steelDensity').value= 7850;
+  document.getElementById('steelWastage').value= 5;
+  document.getElementById('shutter').value     = 0;
+  document.getElementById('costCement').value  = 900;
+  document.getElementById('costSand').value    = 2500;
+  document.getElementById('costAgg').value     = 3000;
+  document.getElementById('costWater').value   = 5;
+  document.getElementById('costSteel').value   = 120;
+  document.getElementById('costAdmixture').value = 0;
+  document.getElementById('admixDose').value   = 0;
+  document.getElementById('labourConc').value  = 1800;
+  document.getElementById('labourSteel').value = 15;
+  document.getElementById('labourShutter').value = 350;
+  document.getElementById('labourCuring').value  = 200;
+  document.getElementById('overhead').value    = 15;
+
+  const resultIds = ['r_grossVol','r_dedVol','r_netVol','r_designVol','r_dryVol',
+    'r_cementVol','r_cementBags','r_cementKg','r_sandVol','r_sandKg',
+    'r_aggVol','r_aggKg','r_water','r_admix','r_steel','r_concMass',
+    'r_costCement','r_costSand','r_costAgg','r_costWater','r_costAdmix',
+    'r_costSteel','r_costLabourConc','r_costLabourSteel','r_costLabourShutter',
+    'r_costCuring','r_directCost','r_overhead','r_totalCost','r_costPerM3','r_costPerM2'];
+  resultIds.forEach(id => set(id, '—'));
+  ['sc_vol','sc_cement','sc_steel','sc_total'].forEach(id => set(id, '—'));
+
+  onMemberChange();
+  onGradeChange();
+}
+
+function toggleFormula() {
+  const box = document.getElementById('formulaBox');
+  const btn = document.getElementById('formulaToggleBtn');
+  const visible = box.style.display !== 'none';
+  box.style.display = visible ? 'none' : 'block';
+  btn.textContent = visible ? '▶ Show Formulas Used' : '▼ Hide Formulas Used';
+}
+
+window.onload = function() {
+  onMemberChange();
+  onGradeChange();
+  calculate();
+};
+</script>
+</body>
+</html>
