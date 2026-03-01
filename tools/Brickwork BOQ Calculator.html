@@ -1,667 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brickwork Estimation Calculator — IS 2212</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --brick:#C0522A;--brick-light:#E8856A;--mortar:#D4C5A9;--mortar-dark:#B0A08A;
-    --bg:#FAF7F2;--bg2:#F0EBE1;--ink:#1A1510;--ink2:#4A3F35;--ink3:#7A6F65;
-    --accent:#2C6E49;--gold:#B8860B;--white:#FFFFFF;
-    --shadow:0 4px 24px rgba(26,21,16,0.10);
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brickwork Quantity & Cost Estimator — BY Er. Shankar Bhujel</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --surface2: #e8e8e8;
+      --border: #bdbdbd;
+      --border-dark: #9e9e9e;
+      --accent: #1565C0;
+      --output: #2E7D32;
+      --text: #212121;
+      --muted: #616161;
+      --header-bg: #1565C0;
+      --header-text: #ffffff;
+      --row-alt: #f9f9f9;
+      --warn: #b71c1c;
+    }
 
-  header{background:var(--ink);color:var(--white);padding:0 2rem;position:relative;overflow:hidden;}
-  header::before{content:'';position:absolute;inset:0;
-    background:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,255,255,0.03) 28px,rgba(255,255,255,0.03) 29px),
-    repeating-linear-gradient(90deg,transparent,transparent 58px,rgba(255,255,255,0.03) 58px,rgba(255,255,255,0.03) 59px);}
-  .header-inner{max-width:1200px;margin:0 auto;padding:3rem 0 2.5rem;position:relative;z-index:1;
-    display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap;}
-  .logo-area h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);line-height:1.1;letter-spacing:-0.02em;}
-  .logo-area h1 span{color:var(--brick-light);}
-  .logo-area p{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--mortar);margin-top:0.5rem;letter-spacing:0.12em;text-transform:uppercase;}
-  .badge{background:var(--brick);color:var(--white);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;padding:0.35rem 0.9rem;border-radius:2px;white-space:nowrap;}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  main{max-width:1200px;margin:0 auto;padding:2.5rem 2rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
 
-  .card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;}
-  .card-header{background:var(--bg2);border-bottom:1px solid var(--mortar);padding:1.1rem 1.5rem;
-    display:flex;align-items:center;gap:0.75rem;}
-  .card-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
-  .icon-brick{background:var(--brick);} .icon-mortar{background:var(--ink2);} .icon-result{background:var(--accent);} .icon-rate{background:var(--gold);}
-  .card-header h2{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink);}
-  .card-header span.sub{font-size:0.72rem;color:var(--ink3);font-family:'DM Mono',monospace;margin-left:auto;letter-spacing:0.05em;}
-  .card-body{padding:1.5rem;}
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.6rem 1.5rem;
+    }
+    .header-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-by { font-size: 1rem; font-weight: bold; letter-spacing: 0.03em; }
+    .header-tool-name { font-size: 0.82rem; opacity: 0.85; }
 
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  .form-grid.triple{grid-template-columns:1fr 1fr 1fr;}
-  .form-grid.five{grid-template-columns:repeat(5,1fr);}
-  .form-grid.three{grid-template-columns:repeat(3,1fr);}
-  .field{display:flex;flex-direction:column;gap:0.35rem;}
-  .field label{font-size:0.75rem;font-weight:600;color:var(--ink2);letter-spacing:0.04em;text-transform:uppercase;}
-  .field .hint{font-size:0.68rem;color:var(--ink3);font-family:'DM Mono',monospace;}
-  .input-wrap{display:flex;align-items:center;border:1.5px solid var(--mortar-dark);border-radius:7px;background:var(--bg);overflow:hidden;transition:border-color 0.2s;}
-  .input-wrap:focus-within{border-color:var(--brick);background:var(--white);}
-  .input-wrap input,.input-wrap select{flex:1;padding:0.55rem 0.75rem;border:none;background:transparent;font-family:'DM Mono',monospace;font-size:0.9rem;color:var(--ink);outline:none;min-width:0;}
-  .input-wrap select{cursor:pointer;}
-  .unit{padding:0 0.65rem;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--ink3);background:var(--mortar);
-    height:100%;display:flex;align-items:center;white-space:nowrap;border-left:1px solid var(--mortar-dark);}
+    /* ── NAV ── */
+    .main-nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 1.5rem;
+      font-size: 0.82rem;
+    }
+    .main-nav a { color: var(--accent); text-decoration: none; margin-right: 1.5rem; }
+    .main-nav a:hover { text-decoration: underline; }
 
-  .section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--brick);letter-spacing:0.15em;
-    text-transform:uppercase;padding:0.75rem 0 0.4rem;border-top:1px dashed var(--mortar-dark);margin-top:0.5rem;}
-  .section-label:first-child{border-top:none;margin-top:0;padding-top:0;}
+    /* ── PAGE TITLE ── */
+    .page-title {
+      max-width: 980px;
+      margin: 1rem auto 0.75rem;
+      padding: 0 1.5rem 0.6rem;
+      border-bottom: 2px solid var(--accent);
+    }
+    .page-title h1 { font-size: 1.25rem; color: var(--accent); margin-bottom: 0.2rem; }
+    .page-title p { font-size: 0.82rem; color: var(--muted); }
 
-  .preset-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;}
-  .preset-btn{font-family:'DM Mono',monospace;font-size:0.68rem;padding:0.3rem 0.6rem;border:1.5px solid var(--mortar-dark);
-    border-radius:4px;background:var(--bg);cursor:pointer;color:var(--ink2);transition:all 0.15s;white-space:nowrap;}
-  .preset-btn:hover,.preset-btn.active{background:var(--brick);border-color:var(--brick);color:var(--white);}
+    /* ── WRAPPER ── */
+    .wrapper {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 1.5rem 2rem;
+    }
 
-  .btn-row{grid-column:1/-1;display:flex;gap:1rem;}
-  .calc-btn{width:100%;padding:0.9rem;background:var(--ink);color:var(--white);border:none;border-radius:8px;
-    font-family:'DM Serif Display',serif;font-size:1.1rem;cursor:pointer;position:relative;overflow:hidden;transition:background 0.2s;}
-  .calc-btn::after{content:'';position:absolute;inset:0;background:var(--brick);transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease;z-index:0;}
-  .calc-btn:hover::after{transform:scaleX(1);}
-  .calc-btn span{position:relative;z-index:1;}
-  .calc-btn:active{transform:scale(0.99);}
-  .reset-btn{flex:0 0 auto;padding:0.9rem 1.5rem;background:var(--bg2);color:var(--ink);border:none;border-radius:8px;
-    font-family:'DM Serif Display',serif;font-size:1.1rem;cursor:pointer;}
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: var(--header-bg);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      padding: 0.3rem 0.75rem;
+      display: inline-block;
+      margin-top: 1rem;
+    }
 
-  .error-msg{background:#fff0ed;border:1px solid #ffb8a8;border-radius:6px;padding:0.65rem 0.9rem;
-    font-size:0.8rem;color:#c0392b;font-family:'DM Mono',monospace;grid-column:1/-1;display:none;}
+    /* ── TABLES ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
-  /* Results */
-  .results-card{grid-column:1/-1;display:none;}
-  .results-card.show{display:block;}
+    table th {
+      background: var(--accent);
+      color: #fff;
+      text-align: left;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      font-weight: bold;
+      border: 1px solid #0d47a1;
+    }
 
-  .results-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--mortar);border-radius:10px;overflow:hidden;margin-bottom:2rem;}
-  .result-item{background:var(--white);padding:1.15rem 1rem;display:flex;flex-direction:column;gap:0.2rem;position:relative;}
-  .result-item::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-  .c1::before{background:var(--brick);} .c2::before{background:var(--ink2);} .c3::before{background:var(--accent);}
-  .c4::before{background:var(--mortar-dark);} .c5::before{background:var(--gold);}
-  .result-label{font-size:0.67rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink3);font-family:'DM Mono',monospace;}
-  .result-value{font-family:'DM Serif Display',serif;font-size:1.7rem;color:var(--ink);line-height:1;}
-  .result-value .ru{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--ink3);font-weight:400;margin-left:0.15rem;}
-  .result-note{font-size:0.67rem;color:var(--ink3);font-family:'DM Mono',monospace;}
+    table td {
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.6rem;
+      background: var(--bg);
+      vertical-align: middle;
+    }
+    table tr:nth-child(even) td { background: var(--row-alt); }
 
-  /* BOQ */
-  .section-title{font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:0.6rem;color:var(--ink);}
-  .section-title span{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--ink3);font-weight:400;margin-left:0.5rem;}
-  .tbl-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--mortar);margin-bottom:2rem;}
+    .param-label { width: 42%; font-weight: 500; color: var(--text); }
+    .param-input { width: 38%; }
+    .param-unit  { width: 20%; color: var(--muted); font-size: 0.8rem; }
 
-  /* BOQ table */
-  .boq{width:100%;border-collapse:collapse;font-size:0.84rem;}
-  .boq thead tr{background:var(--ink);color:var(--white);}
-  .boq thead th{padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.69rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;white-space:nowrap;}
-  .boq thead th.r{text-align:right;}
-  .boq tbody tr{border-bottom:1px solid var(--bg2);transition:background 0.1s;}
-  .boq tbody tr:nth-child(even){background:var(--bg);}
-  .boq tbody tr:hover{background:#f5ede4;}
-  .boq tbody td{padding:0.72rem 1rem;color:var(--ink2);font-family:'DM Mono',monospace;font-size:0.82rem;vertical-align:middle;}
-  .boq tbody td.nm{font-family:'DM Sans',sans-serif;font-weight:600;color:var(--ink);}
-  .boq tbody td.r{text-align:right;}
-  .boq tbody td.amt{text-align:right;font-weight:700;color:var(--ink);}
-  .boq .sec-hdr td{background:var(--bg2);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.12em;font-weight:700;padding:0.45rem 1rem;text-transform:uppercase;}
-  .boq .row-sub td{background:#f5f0ea;font-weight:600;color:var(--ink);border-top:2px solid var(--mortar-dark);}
-  .boq .row-tax td{background:var(--bg2);font-weight:600;color:var(--ink2);}
-  .boq .row-net td{background:var(--ink2);color:var(--white)!important;font-weight:700;font-size:0.9rem;}
-  .boq .row-gst td{background:var(--bg2);color:var(--ink2)!important;font-weight:600;}
-  .boq .row-grand td{background:var(--brick);color:var(--white)!important;font-weight:700;font-size:1rem;}
-  .boq .row-note td{background:#fffbf0;color:var(--ink3);font-style:italic;font-size:0.73rem;border-bottom:none;}
+    input[type="number"], select {
+      width: 100%;
+      border: 1px solid var(--border-dark);
+      padding: 0.28rem 0.5rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.88rem;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--accent);
+      outline: 1px solid var(--accent);
+    }
 
-  /* Breakdown */
-  .bkd-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--mortar);margin-bottom:1.5rem;}
-  .bkd{width:100%;border-collapse:collapse;font-size:0.83rem;}
-  .bkd thead tr{background:var(--ink2);color:var(--white);}
-  .bkd thead th{padding:0.65rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.69rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;}
-  .bkd tbody tr{border-bottom:1px solid var(--bg2);}
-  .bkd tbody tr:nth-child(even){background:var(--bg);}
-  .bkd tbody td{padding:0.6rem 1rem;color:var(--ink2);font-family:'DM Mono',monospace;font-size:0.81rem;}
-  .bkd tbody td:first-child{font-family:'DM Sans',sans-serif;font-weight:500;color:var(--ink);}
-  .bkd tbody td.hl{color:var(--brick);font-weight:700;}
-  .bkd tfoot tr{background:var(--brick);}
-  .bkd tfoot td{padding:0.75rem 1rem;color:var(--white);font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;}
+    /* ── OUTPUT TABLE ── */
+    .output-table th {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .result-value {
+      font-weight: bold;
+      color: var(--output);
+      font-family: 'Courier New', monospace;
+      font-size: 0.92rem;
+    }
+    .result-total {
+      font-weight: bold;
+      color: var(--warn);
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+    }
 
-  .is-note{background:linear-gradient(135deg,#f0f7f3,#e8f4ed);border:1px solid #b8dfc8;border-radius:8px;
-    padding:1rem 1.2rem;display:flex;gap:0.75rem;align-items:flex-start;}
-  .is-note-icon{font-size:1.1rem;flex-shrink:0;margin-top:0.1rem;}
-  .is-note-text{font-size:0.78rem;color:#2C6E49;line-height:1.6;font-family:'DM Mono',monospace;}
-  .is-note-text strong{font-weight:600;display:block;margin-bottom:0.2rem;font-size:0.8rem;}
+    /* ── BUTTONS ── */
+    .btn-row { margin: 0.75rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .calc-btn {
+      background: var(--accent); color: #fff; border: none;
+      padding: 0.45rem 1.6rem; font-size: 0.88rem;
+      font-family: Arial, sans-serif; cursor: pointer; font-weight: bold;
+    }
+    .calc-btn:hover { background: #0d47a1; }
+    .reset-btn {
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border-dark);
+      padding: 0.45rem 1.2rem; font-size: 0.88rem;
+      font-family: Arial, sans-serif; cursor: pointer;
+    }
+    .reset-btn:hover { background: #ddd; }
+    .print-btn {
+      background: #fff; color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.45rem 1.2rem; font-size: 0.88rem;
+      font-family: Arial, sans-serif; cursor: pointer;
+      margin-left: auto;
+    }
+    .print-btn:hover { background: #e3f0ff; }
 
-  .print-btn{display:inline-flex;align-items:center;gap:0.5rem;margin-top:1.25rem;padding:0.65rem 1.2rem;
-    background:var(--accent);color:var(--white);border:none;border-radius:7px;font-family:'DM Sans',sans-serif;
-    font-weight:600;font-size:0.85rem;cursor:pointer;transition:opacity 0.2s;}
-  .print-btn:hover{opacity:0.85;}
+    /* ── FORMULA BOX ── */
+    .formula-box {
+      background: #fffde7;
+      border: 1px solid #f9a825;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      font-family: 'Courier New', monospace;
+      color: #5d4037;
+      line-height: 1.7;
+      margin-top: 0.5rem;
+    }
+    .formula-box strong { font-family: Arial, sans-serif; font-size: 0.78rem; }
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-  .results-card.show{animation:fadeUp 0.35s ease forwards;}
+    /* ── NOTE BOX ── */
+    .note-box {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      padding: 0.55rem 1rem;
+      font-size: 0.8rem;
+      color: #1b5e20;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
 
-  @media print{
-    header::before{display:none;}.calc-btn,.reset-btn,.print-btn,.preset-btn{display:none!important;}
-    .card{box-shadow:none;border:1px solid #ccc;}.main{padding:0;}
-    .results-card{display:block!important;}
-  }
-  @media(max-width:900px){
-    main{grid-template-columns:1fr;}.results-card{grid-column:1;}
-    .results-grid{grid-template-columns:1fr 1fr 1fr;}.form-grid.triple{grid-template-columns:1fr 1fr;}
-    .form-grid.five{grid-template-columns:1fr 1fr;}
-    .form-grid.three{grid-template-columns:1fr 1fr;}
-  }
-  @media(max-width:560px){
-    .results-grid{grid-template-columns:1fr 1fr;}.form-grid,.form-grid.triple,.form-grid.five,.form-grid.three{grid-template-columns:1fr;}
-  }
-</style>
+    /* ── TWO COLUMN LAYOUT ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 0; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      max-width: 980px;
+      margin: 2rem auto 0;
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    @media print {
+      .btn-row, .main-nav { display: none; }
+      .site-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
+<!-- HEADER -->
+<header class="site-header">
   <div class="header-inner">
-    <div class="logo-area">
-      <h1>Brickwork <span>Estimator</span></h1>
-      <p>Bill of Quantities · IS 2212:1991 · IS 1905:1987 · IS 1077:1992</p>
-    </div>
-    <div class="badge">IS CODE COMPLIANT</div>
+    <span class="header-by">BY Er. Shankar Bhujel</span>
+    <span class="header-tool-name">Brickwork Quantity &amp; Cost Estimator</span>
   </div>
 </header>
 
-<main>
+<!-- NAV -->
+<nav class="main-nav">
+  <a href="../index.html">← Portfolio</a>
+  <a href="index.html">Tools Index</a>
+</nav>
 
-  <!-- Wall Dimensions -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon icon-brick">🧱</div>
-      <h2>Wall Dimensions</h2>
-      <span class="sub">in Metres</span>
+<!-- PAGE TITLE -->
+<div class="page-title">
+  <h1>Brickwork Quantity &amp; Cost Estimator</h1>
+  <p>Calculates number of bricks, mortar volume, and total cost for any wall section</p>
+</div>
+
+<div class="wrapper">
+
+  <!-- ── SECTION 1: WALL DIMENSIONS ── -->
+  <div class="section-label">1. Wall Dimensions</div>
+  <table>
+    <thead>
+      <tr>
+        <th class="param-label">Parameter</th>
+        <th class="param-input">Value</th>
+        <th class="param-unit">Unit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="param-label">Wall Length (L)</td>
+        <td class="param-input"><input type="number" id="length" value="5" min="0" step="0.01" /></td>
+        <td class="param-unit">m</td>
+      </tr>
+      <tr>
+        <td class="param-label">Wall Height (H)</td>
+        <td class="param-input"><input type="number" id="height" value="3" min="0" step="0.01" /></td>
+        <td class="param-unit">m</td>
+      </tr>
+      <tr>
+        <td class="param-label">Wall Thickness</td>
+        <td class="param-input">
+          <select id="thickness">
+            <option value="0.1">Half Brick (100 mm)</option>
+            <option value="0.2" selected>One Brick (200 mm)</option>
+            <option value="0.3">One &amp; Half Brick (300 mm)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </td>
+        <td class="param-unit">—</td>
+      </tr>
+      <tr id="customThicknessRow" style="display:none;">
+        <td class="param-label">Custom Thickness</td>
+        <td class="param-input"><input type="number" id="customThickness" value="250" min="0" step="1" /></td>
+        <td class="param-unit">mm</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── SECTION 2: OPENINGS (DEDUCTIONS) ── -->
+  <div class="section-label">2. Openings / Deductions (optional)</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Opening</th>
+        <th>Width (m)</th>
+        <th>Height (m)</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Doors</td>
+        <td><input type="number" id="doorW" value="0.9" min="0" step="0.01" /></td>
+        <td><input type="number" id="doorH" value="2.1" min="0" step="0.01" /></td>
+        <td><input type="number" id="doorN" value="1"   min="0" step="1"    /></td>
+      </tr>
+      <tr>
+        <td>Windows</td>
+        <td><input type="number" id="winW"  value="1.2" min="0" step="0.01" /></td>
+        <td><input type="number" id="winH"  value="1.2" min="0" step="0.01" /></td>
+        <td><input type="number" id="winN"  value="2"   min="0" step="1"    /></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── SECTION 3: BRICK & MORTAR SPECS ── -->
+  <div class="section-label">3. Brick &amp; Mortar Specifications</div>
+  <div class="two-col">
+    <div>
+      <table>
+        <thead>
+          <tr><th colspan="3">Brick Dimensions</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Brick Length</td>
+            <td class="param-input"><input type="number" id="bL" value="230" min="1" step="1" /></td>
+            <td class="param-unit">mm</td>
+          </tr>
+          <tr>
+            <td class="param-label">Brick Width</td>
+            <td class="param-input"><input type="number" id="bW" value="110" min="1" step="1" /></td>
+            <td class="param-unit">mm</td>
+          </tr>
+          <tr>
+            <td class="param-label">Brick Height</td>
+            <td class="param-input"><input type="number" id="bH" value="75" min="1" step="1" /></td>
+            <td class="param-unit">mm</td>
+          </tr>
+          <tr>
+            <td class="param-label">Mortar Joint Thickness</td>
+            <td class="param-input"><input type="number" id="joint" value="10" min="1" step="1" /></td>
+            <td class="param-unit">mm</td>
+          </tr>
+          <tr>
+            <td class="param-label">Wastage Factor</td>
+            <td class="param-input"><input type="number" id="wastage" value="5" min="0" step="0.5" /></td>
+            <td class="param-unit">%</td>
+          </tr>
+          <tr>
+            <td class="param-label">Dry-to-Wet Bulking Factor <span style="font-weight:normal;color:var(--muted);font-size:0.76rem;">(IS 2212 recommends 1.30)</span></td>
+            <td class="param-input"><input type="number" id="bulkFactor" value="1.30" min="1" max="2" step="0.01" /></td>
+            <td class="param-unit">—</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="card-body">
-      <div class="section-label">Wall Parameters</div>
-      <div class="form-grid triple">
-        <div class="field"><label>Length</label>
-          <div class="input-wrap"><input type="number" id="length" value="5" min="0.1" step="0.01"><span class="unit">m</span></div></div>
-        <div class="field"><label>Height</label>
-          <div class="input-wrap"><input type="number" id="height" value="3" min="0.1" step="0.01"><span class="unit">m</span></div></div>
-        <div class="field"><label>Thickness</label>
-          <div class="input-wrap">
-            <select id="wall_thickness">
-              <option value="0.1">Half Brick (100mm)</option>
-              <option value="0.2" selected>One Brick (200mm)</option>
-              <option value="0.3">1.5 Brick (300mm)</option>
-              <option value="0.4">Double Brick (400mm)</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div></div>
-      </div>
-      <div class="field" id="custom_thickness_wrap" style="display:none;margin-top:0.75rem;">
-        <label>Custom Thickness</label>
-        <div class="input-wrap"><input type="number" id="custom_thickness" value="0.23" min="0.05" step="0.01"><span class="unit">m</span></div>
-      </div>
-
-      <div class="section-label">Deductions (Optional)</div>
-      <div class="form-grid">
-        <div class="field"><label>Door Openings</label>
-          <div class="input-wrap"><input type="number" id="door_area" value="0" min="0" step="0.01"><span class="unit">m²</span></div>
-          <span class="hint">Total area of all doors</span></div>
-        <div class="field"><label>Window Openings</label>
-          <div class="input-wrap"><input type="number" id="window_area" value="0" min="0" step="0.01"><span class="unit">m²</span></div>
-          <span class="hint">Total area of all windows</span></div>
-      </div>
-
-      <div class="section-label">Wastage</div>
-      <div class="form-grid">
-        <div class="field"><label>Brick Wastage %</label>
-          <div class="input-wrap"><input type="number" id="wastage" value="5" min="0" max="30" step="0.5"><span class="unit">%</span></div>
-          <span class="hint">IS standard: 5%</span></div>
-        <div class="field"><label>Mortar Waste %</label>
-          <div class="input-wrap"><input type="number" id="mortar_wastage" value="30" min="5" max="50" step="1"><span class="unit">%</span></div>
-          <span class="hint">IS: 30% bulking/waste</span></div>
-      </div>
+    <div>
+      <table>
+        <thead>
+          <tr><th colspan="3">Mortar Mix &amp; Rate</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Mortar Mix Ratio (Cement:Sand)</td>
+            <td class="param-input">
+              <select id="mortarMix">
+                <option value="1:3">1:3</option>
+                <option value="1:4">1:4</option>
+                <option value="1:5" selected>1:5</option>
+                <option value="1:6">1:6</option>
+              </select>
+            </td>
+            <td class="param-unit">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Cost</td>
+            <td class="param-input"><input type="number" id="cementCost" value="900" min="0" step="1" /></td>
+            <td class="param-unit">NPR / bag (50 kg)</td>
+          </tr>
+          <tr>
+            <td class="param-label">Sand Cost</td>
+            <td class="param-input"><input type="number" id="sandCost" value="2500" min="0" step="1" /></td>
+            <td class="param-unit">NPR / m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Brick Rate</td>
+            <td class="param-input"><input type="number" id="brickCost" value="18" min="0" step="0.5" /></td>
+            <td class="param-unit">NPR / brick</td>
+          </tr>
+          <tr>
+            <td class="param-label">Labour Rate</td>
+            <td class="param-input"><input type="number" id="labourCost" value="350" min="0" step="1" /></td>
+            <td class="param-unit">NPR / m²</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Brick & Mortar Specs -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon icon-mortar">⚙️</div>
-      <h2>Brick &amp; Mortar Specs</h2>
-      <span class="sub">IS 1077 Compliant</span>
-    </div>
-    <div class="card-body">
-      <div class="section-label">Standard Brick Presets (IS 1077)</div>
-      <div class="preset-row">
-        <button class="preset-btn active" onclick="setBrick(190,90,90,this)">Standard (190×90×90)</button>
-        <button class="preset-btn" onclick="setBrick(230,110,76,this)">Modular (230×110×76)</button>
-        <button class="preset-btn" onclick="setBrick(230,115,75,this)">Imperial (230×115×75)</button>
-        <button class="preset-btn" onclick="setBrick(200,100,100,this)">Large Format (200×100×100)</button>
-      </div>
-
-      <div class="section-label">Brick Dimensions</div>
-      <div class="form-grid triple">
-        <div class="field"><label>Length</label><div class="input-wrap"><input type="number" id="brick_l" value="190" min="50" step="1"><span class="unit">mm</span></div></div>
-        <div class="field"><label>Width</label><div class="input-wrap"><input type="number" id="brick_w" value="90" min="50" step="1"><span class="unit">mm</span></div></div>
-        <div class="field"><label>Height</label><div class="input-wrap"><input type="number" id="brick_h" value="90" min="30" step="1"><span class="unit">mm</span></div></div>
-      </div>
-
-      <div class="section-label">Mortar Joint Thickness</div>
-      <div class="form-grid">
-        <div class="field"><label>Bed Joint</label>
-          <div class="input-wrap"><input type="number" id="bed_joint" value="10" min="6" max="20" step="1"><span class="unit">mm</span></div>
-          <span class="hint">IS standard: 10mm</span></div>
-        <div class="field"><label>Perpend Joint</label>
-          <div class="input-wrap"><input type="number" id="perp_joint" value="10" min="6" max="20" step="1"><span class="unit">mm</span></div>
-          <span class="hint">IS standard: 10mm</span></div>
-      </div>
-
-      <div class="section-label">Mortar Mix Ratio (IS 2250)</div>
-      <div class="form-grid">
-        <div class="field"><label>Mix Grade</label>
-          <div class="input-wrap">
-            <select id="mortar_grade" onchange="updateMixRatio()">
-              <option value="1:3">M1 — Cement:Sand 1:3</option>
-              <option value="1:4">M2 — Cement:Sand 1:4</option>
-              <option value="1:5">M3 — Cement:Sand 1:5</option>
-              <option value="1:6" selected>M4 — Cement:Sand 1:6</option>
-              <option value="1:8">M5 — Cement:Sand 1:8</option>
-            </select>
-          </div>
-          <span class="hint" id="mix_note">General use, protected exposure</span></div>
-        <div class="field"><label>Cement Density</label>
-          <div class="input-wrap"><input type="number" id="cement_density" value="1440" min="1200" max="1600" step="10"><span class="unit">kg/m³</span></div>
-          <span class="hint">IS standard: 1440 kg/m³</span></div>
-      </div>
+  <!-- FORMULA REFERENCE -->
+  <div style="margin-top:0.5rem;">
+    <button onclick="toggleFormula()" id="formulaToggleBtn" style="background:none;border:1px solid #f9a825;color:#5d4037;font-size:0.78rem;font-family:Arial,sans-serif;padding:0.25rem 0.75rem;cursor:pointer;">▶ Show Formulas Used</button>
+    <div id="formulaBox" class="formula-box" style="display:none;margin-top:0;">
+      <strong>Formulas used:</strong><br>
+      Gross Wall Area = L × H &nbsp;|&nbsp; Net Wall Area = Gross − Openings<br>
+      Wall Volume = Net Area × Thickness<br>
+      Brick Volume (with joint) = (bL + j) × (bW + j) × (bH + j) in m³<br>
+      No. of Bricks = Wall Volume / Brick Volume × (1 + wastage%)<br>
+      Mortar Volume ≈ Wall Volume − (No. bricks × bL×bW×bH)<br>
+      Dry Mortar Volume = Mortar Volume × Bulking Factor<br>
+      Cement bags = Dry Vol × (1 / (ratio+1)) / 0.035 m³ per bag<br>
+      Sand = Dry Vol × (ratio / (ratio+1))
     </div>
   </div>
 
-  <!-- Rates Card (full width) -->
-  <div class="card" style="grid-column:1/-1;">
-    <div class="card-header">
-      <div class="card-icon icon-rate">💰</div>
-      <h2>Material &amp; Labour Rates</h2>
-      <span class="sub">Enter prevailing market rates for your region</span>
-    </div>
-    <div class="card-body">
-      <div class="section-label">Material Rates</div>
-      <div class="form-grid five">
-        <div class="field"><label>Brick Rate</label>
-          <div class="input-wrap"><input type="number" id="rate_brick" value="8" min="0" step="0.5"><span class="unit">₹/nos</span></div>
-          <span class="hint">Per brick unit</span></div>
-        <div class="field"><label>Cement Rate</label>
-          <div class="input-wrap"><input type="number" id="rate_cement" value="380" min="0" step="5"><span class="unit">₹/bag</span></div>
-          <span class="hint">Per 50 kg bag</span></div>
-        <div class="field"><label>Sand Rate</label>
-          <div class="input-wrap"><input type="number" id="rate_sand" value="1200" min="0" step="50"><span class="unit">₹/m³</span></div>
-          <span class="hint">Per cubic metre</span></div>
-        <div class="field"><label>Mason Labour</label>
-          <div class="input-wrap"><input type="number" id="rate_mason" value="700" min="0" step="50"><span class="unit">₹/m³</span></div>
-          <span class="hint">Skilled mason per m³</span></div>
-        <div class="field"><label>Helper Labour</label>
-          <div class="input-wrap"><input type="number" id="rate_helper" value="350" min="0" step="25"><span class="unit">₹/m³</span></div>
-          <span class="hint">Unskilled helper per m³</span></div>
-      </div>
-      <div class="section-label">Overheads &amp; Tax</div>
-      <div class="form-grid three">
-        <div class="field"><label>Scaffolding &amp; Misc</label>
-          <div class="input-wrap"><input type="number" id="rate_misc" value="200" min="0" step="10"><span class="unit">₹/m³</span></div>
-          <span class="hint">Scaffolding, water, misc</span></div>
-        <div class="field"><label>Overhead &amp; Profit %</label>
-          <div class="input-wrap"><input type="number" id="rate_overhead" value="10" min="0" max="30" step="0.5"><span class="unit">%</span></div>
-          <span class="hint">On direct cost total</span></div>
-        <div class="field"><label>GST %</label>
-          <div class="input-wrap"><input type="number" id="rate_gst" value="18" min="0" max="28" step="1"><span class="unit">%</span></div>
-          <span class="hint">Applicable GST rate</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="error-msg" id="error_msg"></div>
-
+  <!-- BUTTONS -->
   <div class="btn-row">
-    <button class="calc-btn" onclick="calculate()" style="flex:1;"><span>⟶ Generate Estimation &amp; BOQ Report</span></button>
+    <button class="calc-btn" onclick="calculate()">Calculate</button>
     <button class="reset-btn" onclick="resetForm()">Reset</button>
   </div>
 
-  <!-- Results -->
-  <div class="card results-card" id="results_card">
-    <div class="card-header">
-      <div class="card-icon icon-result">📋</div>
-      <h2>Estimation &amp; Bill of Quantities</h2>
-      <span class="sub" id="report_date"></span>
+  <!-- ── RESULTS ── -->
+  <div class="section-label">4. Results</div>
+  <div class="two-col">
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="3">Quantity Summary</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Gross Wall Area</td>
+            <td class="result-value" id="r_grossArea">—</td>
+            <td class="param-unit">m²</td>
+          </tr>
+          <tr>
+            <td class="param-label">Opening Area (deducted)</td>
+            <td class="result-value" id="r_openingArea">—</td>
+            <td class="param-unit">m²</td>
+          </tr>
+          <tr>
+            <td class="param-label">Net Wall Area</td>
+            <td class="result-value" id="r_netArea">—</td>
+            <td class="param-unit">m²</td>
+          </tr>
+          <tr>
+            <td class="param-label">Wall Volume</td>
+            <td class="result-value" id="r_volume">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Bricks Required (net)</td>
+            <td class="result-value" id="r_bricksNet">—</td>
+            <td class="param-unit">nos</td>
+          </tr>
+          <tr>
+            <td class="param-label">Bricks Required (with wastage)</td>
+            <td class="result-value" id="r_bricksGross">—</td>
+            <td class="param-unit">nos</td>
+          </tr>
+          <tr>
+            <td class="param-label">Mortar Volume (wet)</td>
+            <td class="result-value" id="r_mortarWet">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Dry Mortar Volume</td>
+            <td class="result-value" id="r_mortarDry">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Required</td>
+            <td class="result-value" id="r_cement">—</td>
+            <td class="param-unit">bags (50 kg)</td>
+          </tr>
+          <tr>
+            <td class="param-label">Sand Required</td>
+            <td class="result-value" id="r_sand">—</td>
+            <td class="param-unit">m³</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="card-body">
+    <div>
+      <table class="output-table">
+        <thead><tr><th colspan="2">Cost Breakdown</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Brick Cost</td>
+            <td class="result-value" id="r_costBrick">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cement Cost</td>
+            <td class="result-value" id="r_costCement">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Sand Cost</td>
+            <td class="result-value" id="r_costSand">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Labour Cost</td>
+            <td class="result-value" id="r_costLabour">—</td>
+          </tr>
+          <tr>
+            <td style="font-weight:bold; border:1px solid var(--border); padding:0.3rem 0.6rem;">TOTAL COST</td>
+            <td class="result-total" id="r_costTotal">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cost per m²</td>
+            <td class="result-value" id="r_costPerSqm">—</td>
+          </tr>
+          <tr>
+            <td class="param-label">Cost per m³</td>
+            <td class="result-value" id="r_costPerCum">—</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <!-- Summary chips -->
-      <div class="results-grid">
-        <div class="result-item c1">
-          <span class="result-label">Net Wall Volume</span>
-          <span class="result-value" id="r_volume">—<span class="ru">m³</span></span>
-          <span class="result-note">After deductions</span>
-        </div>
-        <div class="result-item c2">
-          <span class="result-label">Bricks Required</span>
-          <span class="result-value" id="r_bricks">—<span class="ru">nos</span></span>
-          <span class="result-note">Incl. wastage</span>
-        </div>
-        <div class="result-item c3">
-          <span class="result-label">Cement</span>
-          <span class="result-value" id="r_cement">—<span class="ru">bags</span></span>
-          <span class="result-note" id="r_cement_kg">—</span>
-        </div>
-        <div class="result-item c4">
-          <span class="result-label">Sand Required</span>
-          <span class="result-value" id="r_sand">—<span class="ru">m³</span></span>
-          <span class="result-note" id="r_sand_cft">—</span>
-        </div>
-        <div class="result-item c5">
-          <span class="result-label">Grand Total</span>
-          <span class="result-value" id="r_total" style="font-size:1.35rem;">—</span>
-          <span class="result-note" id="r_total_note">Incl. GST</span>
-        </div>
+      <div class="note-box" style="margin-top:0.75rem;">
+        ℹ️ Bulking factor (IS 2212): dry mortar volume = wet × factor (default 1.30).<br>
+        Labour rate applied to net wall area (m²).<br>
+        All costs in Nepalese Rupees (NPR). Adjust rates for your region.
       </div>
-
-      <!-- BOQ Table -->
-      <div class="section-title">Bill of Quantities (BOQ) <span>Professional Summary — IS 2212:1991</span></div>
-      <div class="tbl-wrap">
-        <table class="boq">
-          <thead>
-            <tr>
-              <th style="width:3.5rem;">S.No</th>
-              <th>Description of Work / Item</th>
-              <th class="r">Quantity</th>
-              <th>Unit</th>
-              <th class="r">Rate (₹)</th>
-              <th class="r">Amount (₹)</th>
-            </tr>
-          </thead>
-          <tbody id="boq_body"></tbody>
-        </table>
-      </div>
-
-      <!-- Breakdown Table -->
-      <div class="section-title" style="margin-top:0.5rem;">Detailed Calculation Breakdown <span>IS 2212:1991 Method</span></div>
-      <div class="bkd-wrap">
-        <table class="bkd">
-          <thead><tr><th>Parameter</th><th>Formula / Reference</th><th>Value</th><th>Unit</th></tr></thead>
-          <tbody id="breakdown_body"></tbody>
-          <tfoot><tr><td colspan="2">Result Summary</td><td id="tfoot_bricks" colspan="2"></td></tr></tfoot>
-        </table>
-      </div>
-
-      <!-- IS Note -->
-      <div class="is-note">
-        <span class="is-note-icon">✅</span>
-        <div class="is-note-text" id="is_note_text"><strong>IS Code Compliance Notes</strong>Loading…</div>
-      </div>
-
-      <button class="print-btn" onclick="window.print()">🖨&nbsp; Print / Export as PDF</button>
-
     </div>
   </div>
 
-</main>
+</div><!-- /wrapper -->
 
-<footer style="text-align:center;padding:1.5rem 2rem 2.5rem;font-size:0.72rem;color:var(--ink3);font-family:'DM Mono',monospace;letter-spacing:0.05em;">
-  Brickwork Estimator &middot; IS 2212:1991 &middot; IS 1905:1987 &middot; IS 1077:1992 &middot; IS 2250:1981 &middot; IS 383:1970<br>
-  For estimation purposes only. Actual quantities may vary based on site conditions.
+<!-- FOOTER -->
+<footer class="site-footer">
+  BY Er. Shankar Bhujel &nbsp;·&nbsp; Engineering Tools &nbsp;·&nbsp;
+  <a href="../index.html">← Back to Portfolio</a>
 </footer>
 
 <script>
-const mixNotes={
-  '1:3':'High strength — foundations, sewage, water tanks',
-  '1:4':'Strong mix — below DPC, exposed locations',
-  '1:5':'Medium strength — internal walls, moderate exposure',
-  '1:6':'General use, protected exposure',
-  '1:8':'Light work — internal non-load-bearing partitions'
-};
-function updateMixRatio(){document.getElementById('mix_note').textContent=mixNotes[document.getElementById('mortar_grade').value]||'';}
-function setBrick(l,w,h,btn){
-  document.getElementById('brick_l').value=l;
-  document.getElementById('brick_w').value=w;
-  document.getElementById('brick_h').value=h;
-  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-document.getElementById('wall_thickness').addEventListener('change',function(){
-  document.getElementById('custom_thickness_wrap').style.display=this.value==='custom'?'block':'none';
-});
-function getT(){
-  const s=document.getElementById('wall_thickness').value;
-  return s==='custom'?parseFloat(document.getElementById('custom_thickness').value)||0:parseFloat(s);
-}
-function fmt(n,d=2){return Number(n).toFixed(d);}
-function fmtN(n){return Math.ceil(n).toLocaleString('en-IN');}
-function fmtC(n){return '\u20B9\u00A0'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function showErr(m){const e=document.getElementById('error_msg');e.textContent='⚠ '+m;e.style.display='block';}
-function hideErr(){document.getElementById('error_msg').style.display='none';}
-
-function bkdRow(tbody,param,formula,val,unit,hl=false){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${param}</td><td style="color:var(--ink3)">${formula}</td><td class="${hl?'hl':''}">${val}</td><td>${unit}</td>`;
-  tbody.appendChild(tr);
-}
-function secHdr(tbody,label,color){
-  const tr=document.createElement('tr');tr.className='sec-hdr';
-  tr.innerHTML=`<td colspan="6" style="color:${color}">${label}</td>`;
-  tbody.appendChild(tr);
-}
-function boqRow(tbody,sno,desc,qty,unit,rate,amount){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${sno}</td><td class="nm">${desc}</td><td class="r">${qty}</td><td>${unit}</td><td class="r">${rate}</td><td class="amt">${amount}</td>`;
-  tbody.appendChild(tr);
-}
-function boqSpan(tbody,label,amount,cls){
-  const tr=document.createElement('tr');tr.className=cls;
-  tr.innerHTML=`<td colspan="5" style="font-weight:600">${label}</td><td class="r amt">${amount}</td>`;
-  tbody.appendChild(tr);
-}
-function boqNote(tbody,note){
-  const tr=document.createElement('tr');tr.className='row-note';
-  tr.innerHTML=`<td colspan="6">${note}</td>`;
-  tbody.appendChild(tr);
-}
-
-function calculate(){
-  hideErr();
-  const L=parseFloat(document.getElementById('length').value)||0;
-  const H=parseFloat(document.getElementById('height').value)||0;
-  const T=getT();
-  const dA=parseFloat(document.getElementById('door_area').value)||0;
-  const wA=parseFloat(document.getElementById('window_area').value)||0;
-  const wst=parseFloat(document.getElementById('wastage').value)||5;
-  const mwst=parseFloat(document.getElementById('mortar_wastage').value)||30;
-  const bL=parseFloat(document.getElementById('brick_l').value)/1000||0;
-  const bW=parseFloat(document.getElementById('brick_w').value)/1000||0;
-  const bH=parseFloat(document.getElementById('brick_h').value)/1000||0;
-  const bj=parseFloat(document.getElementById('bed_joint').value)/1000||0.01;
-  const pj=parseFloat(document.getElementById('perp_joint').value)/1000||0.01;
-  const cd=parseFloat(document.getElementById('cement_density').value)||1440;
-  const mix=document.getElementById('mortar_grade').value;
-  const mp=mix.split(':');const cp=parseFloat(mp[0]),sp=parseFloat(mp[1]),tp=cp+sp;
-
-  const rBrick=parseFloat(document.getElementById('rate_brick').value)||0;
-  const rCem=parseFloat(document.getElementById('rate_cement').value)||0;
-  const rSand=parseFloat(document.getElementById('rate_sand').value)||0;
-  const rMason=parseFloat(document.getElementById('rate_mason').value)||0;
-  const rHelper=parseFloat(document.getElementById('rate_helper').value)||0;
-  const rMisc=parseFloat(document.getElementById('rate_misc').value)||0;
-  const ovhPct=parseFloat(document.getElementById('rate_overhead').value)||0;
-  const gstPct=parseFloat(document.getElementById('rate_gst').value)||0;
-
-  if(!L||!H||!T) return showErr('Please enter valid wall dimensions.');
-  if(!bL||!bW||!bH) return showErr('Please enter valid brick dimensions.');
-
-  // Quantities
-  const grossArea=L*H;
-  const openArea=dA+wA;
-  const netArea=grossArea-openArea;
-  if(netArea<=0) return showErr('Net wall area after deductions is zero or negative.');
-  const netVol=netArea*T;
-  const bUnitVol=(bL+pj)*bW*(bH+bj);
-  const bPerM3=1/bUnitVol;
-  const bVol=bL*bW*bH;
-  const bNet=bPerM3*netVol;
-  const mFrac=1-(bNet*bVol/netVol);
-  const mWet=mFrac*netVol;
-  const dryF=1+(mwst/100);
-  const mDry=mWet*dryF;
-  const cemVol=(cp/tp)*mDry;
-  const sandVol=(sp/tp)*mDry;
-  const cemKg=cemVol*cd;
-  const cemBags=cemKg/50;
-  const bTotal=bNet*(1+wst/100);
-  const sandCft=sandVol*35.315;
-
-  // Amounts
-  const aBrick=Math.ceil(bTotal)*rBrick;
-  const aCem=Math.ceil(cemBags)*rCem;
-  const aSand=sandVol*rSand;
-  const aMason=netVol*rMason;
-  const aHelper=netVol*rHelper;
-  const aMisc=netVol*rMisc;
-  const matTotal=aBrick+aCem+aSand;
-  const labTotal=aMason+aHelper;
-  const directCost=matTotal+labTotal+aMisc;
-  const overhead=(ovhPct/100)*directCost;
-  const netAmt=directCost+overhead;
-  const gst=(gstPct/100)*netAmt;
-  const grand=netAmt+gst;
-
-  // Summary chips
-  document.getElementById('r_volume').innerHTML=fmt(netVol)+'<span class="ru">m³</span>';
-  document.getElementById('r_bricks').innerHTML=fmtN(bTotal)+'<span class="ru">nos</span>';
-  document.getElementById('r_cement').innerHTML=fmt(cemBags,1)+'<span class="ru">bags</span>';
-  document.getElementById('r_cement_kg').textContent=fmt(cemKg)+' kg total';
-  document.getElementById('r_sand').innerHTML=fmt(sandVol)+'<span class="ru">m³</span>';
-  document.getElementById('r_sand_cft').textContent=fmt(sandCft,1)+' cft';
-  document.getElementById('r_total').textContent=fmtC(grand);
-  document.getElementById('r_total_note').textContent='Incl. '+fmt(gstPct,0)+'% GST';
-
-  // BOQ
-  const boqBody=document.getElementById('boq_body');
-  boqBody.innerHTML='';
-  secHdr(boqBody,'A.  MATERIALS','var(--brick)');
-  boqRow(boqBody,'A-1',
-    'Burnt Clay Bricks (IS 1077:1992) — '+Math.round(bL*1000)+'×'+Math.round(bW*1000)+'×'+Math.round(bH*1000)+' mm, Class Designation A (Min. 75 N/mm²), incl. '+wst+'% wastage for breakage &amp; handling',
-    fmtN(bTotal),'Nos',fmtC(rBrick),fmtC(aBrick));
-  boqRow(boqBody,'A-2',
-    'Ordinary Portland Cement (OPC 43 Grade, IS 8112) — 50 kg bags, for mortar mix '+mix+' (IS 2250:1981)',
-    fmt(cemBags,2),'Bags',fmtC(rCem),fmtC(aCem));
-  boqRow(boqBody,'A-3',
-    'Fine Sand / River Sand conforming to IS 383:1970 Zone II — dry volume incl. '+mwst+'% bulking factor',
-    fmt(sandVol),'m³',fmtC(rSand),fmtC(aSand));
-  boqSpan(boqBody,'Sub-Total — A (Materials)',fmtC(matTotal),'row-sub');
-
-  secHdr(boqBody,'B.  LABOUR','var(--ink2)');
-  boqRow(boqBody,'B-1',
-    'Skilled Mason — Brickwork laying, jointing, plumbing &amp; levelling as per IS 1905:1987',
-    fmt(netVol),'m³',fmtC(rMason),fmtC(aMason));
-  boqRow(boqBody,'B-2',
-    'Unskilled Helper / Mazdoor — Material carrying, mixing, water supply',
-    fmt(netVol),'m³',fmtC(rHelper),fmtC(aHelper));
-  boqSpan(boqBody,'Sub-Total — B (Labour)',fmtC(labTotal),'row-sub');
-
-  secHdr(boqBody,'C.  MISCELLANEOUS &amp; SITE','var(--ink3)');
-  boqRow(boqBody,'C-1',
-    'Scaffolding, curing water supply, form work &amp; miscellaneous site expenses',
-    fmt(netVol),'m³',fmtC(rMisc),fmtC(aMisc));
-  boqSpan(boqBody,'Sub-Total — C (Miscellaneous)',fmtC(aMisc),'row-sub');
-
-  // Totals
-  boqSpan(boqBody,'Direct Cost  (A + B + C)',fmtC(directCost),'row-sub');
-  boqSpan(boqBody,'Contractor Overhead &amp; Profit @ '+fmt(ovhPct,1)+'% on Direct Cost',fmtC(overhead),'row-tax');
-  boqSpan(boqBody,'Net Amount Before Tax',fmtC(netAmt),'row-net');
-  boqSpan(boqBody,'GST @ '+fmt(gstPct,0)+'%  (CGST + SGST / IGST as applicable)',fmtC(gst),'row-gst');
-  boqSpan(boqBody,'GRAND TOTAL  (Incl. all taxes)',fmtC(grand),'row-grand');
-  boqNote(boqBody,'Note: All quantities computed per IS 2212:1991. Rates are indicative market rates; actual rates may vary by location, season and procurement terms. GST levied as per prevailing CGST/SGST regulations. This BOQ is for estimation purposes only.');
-
-  // Breakdown
-  const tbody=document.getElementById('breakdown_body');
-  tbody.innerHTML='';
-  const rows=[
-    ['Gross Wall Area','L × H',fmt(grossArea),'m²'],
-    ['Opening Area (Doors + Windows)','Σ all openings',fmt(openArea),'m²'],
-    ['Net Wall Area','Gross – Openings',fmt(netArea),'m²'],
-    ['Wall Thickness','Input',fmt(T,3),'m'],
-    ['Net Masonry Volume','Net Area × T',fmt(netVol),'m³'],
-    ['Brick Size (L × W × H)','Input (IS 1077)',Math.round(bL*1000)+'×'+Math.round(bW*1000)+'×'+Math.round(bH*1000),'mm'],
-    ['Mortar Joints (Bed / Perpend)','Input (IS 2212)',Math.round(bj*1000)+' / '+Math.round(pj*1000),'mm'],
-    ['Volume per Brick Unit (with mortar)','(L+Pj)×W×(H+Bj)',fmt(bUnitVol,6),'m³'],
-    ['Bricks per m³ of Masonry','1 / unit vol',fmt(bPerM3,2),'nos/m³'],
-    ['Bricks (net, no wastage)','Bricks/m³ × Vol',fmt(bNet,1),'nos'],
-    ['Wastage Addition',wst+'% on net bricks',fmt(bNet*wst/100,1),'nos'],
-    ['Total Bricks Required','Net + Wastage',fmtN(bTotal),'nos',true],
-    ['Wet Mortar Volume','Wall vol – Brick vol',fmt(mWet),'m³'],
-    ['Dry Mortar Volume','Wet × '+dryF.toFixed(2)+' (IS bulking '+mwst+'%)',fmt(mDry),'m³'],
-    ['Cement Volume','('+cp+'/'+tp+') × Dry vol',fmt(cemVol),'m³'],
-    ['Cement Weight','Vol × '+cd+' kg/m³',fmt(cemKg),'kg'],
-    ['Cement Bags (50 kg)','Weight / 50',fmt(cemBags,2),'bags',true],
-    ['Sand Volume','('+sp+'/'+tp+') × Dry vol',fmt(sandVol),'m³'],
-    ['Sand Volume','× 35.315 cft/m³',fmt(sandCft,2),'cft'],
-    ['Direct Material Cost','Bricks+Cement+Sand',fmtC(matTotal),'₹'],
-    ['Direct Labour Cost','Mason+Helper',fmtC(labTotal),'₹'],
-    ['Direct Cost Total','Mat+Lab+Misc',fmtC(directCost),'₹'],
-    ['Overhead & Profit',ovhPct+'%',fmtC(overhead),'₹'],
-    ['Net Amount','Direct+Overhead',fmtC(netAmt),'₹'],
-    ['GST',gstPct+'%',fmtC(gst),'₹'],
-    ['GRAND TOTAL','Net + GST',fmtC(grand),'₹',true]
-  ];
-  rows.forEach(r=>bkdRow(tbody,r[0],r[1],r[2],r[3],r[4]===true));
-  document.getElementById('tfoot_bricks').textContent=
-    fmtN(bTotal)+' Bricks | '+fmt(cemBags,1)+' Bags Cement | '+fmt(sandVol)+' m³ Sand | Grand Total: '+fmtC(grand);
-
-  document.getElementById('is_note_text').innerHTML=
-    '<strong>IS Code Compliance Notes</strong>'+
-    'IS 2212:1991 — Method of measurement of brickwork adopted for volume &amp; quantity calculation.<br>'+
-    'IS 1077:1992 — Common Burnt Clay Building Bricks; size '+Math.round(bL*1000)+'×'+Math.round(bW*1000)+'×'+Math.round(bH*1000)+' mm used.<br>'+
-    'IS 2250:1981 — Code of Practice for Preparation &amp; Use of Masonry Mortars; mix '+mix+' applied.<br>'+
-    'IS 1905:1987 — Code of Practice for Structural Use of Unreinforced Masonry considered.<br>'+
-    'IS 383:1970 — Specification for Coarse &amp; Fine Aggregates (Sand) followed.<br>'+
-    'Dry mortar factor '+dryF.toFixed(2)+'× applied per IS recommendation for bulking &amp; wastage ('+mwst+'%).';
-
-  document.getElementById('report_date').textContent=
-    'Report Date: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-
-  const rc=document.getElementById('results_card');
-  rc.classList.remove('show');
-  setTimeout(()=>{rc.classList.add('show');rc.scrollIntoView({behavior:'smooth',block:'start'});},60);
-}
-
-function resetForm(){
-  document.getElementById('length').value='5';
-  document.getElementById('height').value='3';
-  document.getElementById('wall_thickness').value='0.2';
-  document.getElementById('custom_thickness_wrap').style.display='none';
-  document.getElementById('door_area').value='0';
-  document.getElementById('window_area').value='0';
-  document.getElementById('wastage').value='5';
-  document.getElementById('mortar_wastage').value='30';
-  document.getElementById('brick_l').value='190';
-  document.getElementById('brick_w').value='90';
-  document.getElementById('brick_h').value='90';
-  document.getElementById('bed_joint').value='10';
-  document.getElementById('perp_joint').value='10';
-  document.getElementById('mortar_grade').value='1:6';
-  document.getElementById('cement_density').value='1440';
-  document.getElementById('rate_brick').value='8';
-  document.getElementById('rate_cement').value='380';
-  document.getElementById('rate_sand').value='1200';
-  document.getElementById('rate_mason').value='700';
-  document.getElementById('rate_helper').value='350';
-  document.getElementById('rate_misc').value='200';
-  document.getElementById('rate_overhead').value='10';
-  document.getElementById('rate_gst').value='18';
-  updateMixRatio();
-  document.querySelectorAll('.preset-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
-  document.getElementById('results_card').classList.remove('show');
-  hideErr();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-['brick_l','brick_w','brick_h'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{
-    document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  // Show/hide custom thickness input
+  document.getElementById('thickness').addEventListener('change', function() {
+    document.getElementById('customThicknessRow').style.display =
+      this.value === 'custom' ? '' : 'none';
   });
-});
+
+  function fmt(n, dec = 2) { return Number(n).toFixed(dec); }
+  function fmtInt(n)        { return Math.ceil(n).toLocaleString(); }
+  function fmtCur(n)        { return 'NPR ' + Number(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+  function set(id, val) { document.getElementById(id).textContent = val; }
+
+  function calculate() {
+    // ── Inputs ──
+    const L = parseFloat(document.getElementById('length').value)  || 0;
+    const H = parseFloat(document.getElementById('height').value)  || 0;
+
+    let thickSel = document.getElementById('thickness').value;
+    let T = thickSel === 'custom'
+      ? (parseFloat(document.getElementById('customThickness').value) || 0) / 1000
+      : parseFloat(thickSel);
+
+    const doorW = parseFloat(document.getElementById('doorW').value) || 0;
+    const doorH = parseFloat(document.getElementById('doorH').value) || 0;
+    const doorN = parseFloat(document.getElementById('doorN').value) || 0;
+    const winW  = parseFloat(document.getElementById('winW').value)  || 0;
+    const winH  = parseFloat(document.getElementById('winH').value)  || 0;
+    const winN  = parseFloat(document.getElementById('winN').value)  || 0;
+
+    const bL      = (parseFloat(document.getElementById('bL').value)    || 230) / 1000;
+    const bW      = (parseFloat(document.getElementById('bW').value)    || 110) / 1000;
+    const bH      = (parseFloat(document.getElementById('bH').value)    || 75)  / 1000;
+    const joint   = (parseFloat(document.getElementById('joint').value) || 10)  / 1000;
+    const wastage = (parseFloat(document.getElementById('wastage').value)|| 5)  / 100;
+
+    const mixStr   = document.getElementById('mortarMix').value;   // e.g. "1:5"
+    const ratio    = parseFloat(mixStr.split(':')[1]);              // sand parts
+
+    const cementCostPerBag = parseFloat(document.getElementById('cementCost').value) || 0;
+    const sandCostPerM3    = parseFloat(document.getElementById('sandCost').value)    || 0;
+    const brickCostEach    = parseFloat(document.getElementById('brickCost').value)   || 0;
+    const labourPerM2      = parseFloat(document.getElementById('labourCost').value)  || 0;
+
+    // ── Areas ──
+    const grossArea   = L * H;
+    const openingArea = doorW * doorH * doorN + winW * winH * winN;
+    const netArea     = Math.max(0, grossArea - openingArea);
+    const wallVolume  = netArea * T;
+
+    // ── Brick volume with mortar joint ──
+    const brickVol   = (bL + joint) * (bW + joint) * (bH + joint);   // per brick with joint
+    const bricksNet  = wallVolume / brickVol;
+    const bricksGross = bricksNet * (1 + wastage);
+
+    // ── Mortar ──
+    const mortarWet  = wallVolume - (bricksNet * bL * bW * bH);
+    const bulkFactor = parseFloat(document.getElementById('bulkFactor').value) || 1.30;
+    const mortarDry  = mortarWet * bulkFactor;
+
+    // Cement: total parts = 1 + ratio; cement = 1/(1+ratio); volume per bag = 0.035 m³
+    const totalParts   = 1 + ratio;
+    const cementVol    = mortarDry * (1 / totalParts);
+    const cementBags   = cementVol / 0.035;
+    const sandVol      = mortarDry * (ratio / totalParts);
+
+    // ── Costs ──
+    const costBrick   = bricksGross * brickCostEach;
+    const costCement  = Math.ceil(cementBags) * cementCostPerBag;
+    const costSand    = sandVol * sandCostPerM3;
+    const costLabour  = netArea * labourPerM2;
+    const costTotal   = costBrick + costCement + costSand + costLabour;
+    const costPerSqm  = netArea > 0 ? costTotal / netArea : 0;
+    const costPerCum  = wallVolume > 0 ? costTotal / wallVolume : 0;
+
+    // ── Display ──
+    set('r_grossArea',    fmt(grossArea)   + ' m²');
+    set('r_openingArea',  fmt(openingArea) + ' m²');
+    set('r_netArea',      fmt(netArea)     + ' m²');
+    set('r_volume',       fmt(wallVolume)  + ' m³');
+    set('r_bricksNet',    fmtInt(bricksNet) + ' nos');
+    set('r_bricksGross',  fmtInt(bricksGross) + ' nos');
+    set('r_mortarWet',    fmt(mortarWet)   + ' m³');
+    set('r_mortarDry',    fmt(mortarDry)   + ' m³');
+    set('r_cement',       fmt(cementBags, 1) + ' bags (' + Math.ceil(cementBags) + ' bags ordered)');
+    set('r_sand',         fmt(sandVol)     + ' m³');
+
+    set('r_costBrick',    fmtCur(costBrick));
+    set('r_costCement',   fmtCur(costCement));
+    set('r_costSand',     fmtCur(costSand));
+    set('r_costLabour',   fmtCur(costLabour));
+    set('r_costTotal',    fmtCur(costTotal));
+    set('r_costPerSqm',   fmtCur(costPerSqm) + ' / m²');
+    set('r_costPerCum',   fmtCur(costPerCum)  + ' / m³');
+  }
+
+  function resetForm() {
+    document.getElementById('length').value      = 5;
+    document.getElementById('height').value      = 3;
+    document.getElementById('thickness').value   = '0.2';
+    document.getElementById('customThicknessRow').style.display = 'none';
+    document.getElementById('doorW').value = 0.9;
+    document.getElementById('doorH').value = 2.1;
+    document.getElementById('doorN').value = 1;
+    document.getElementById('winW').value  = 1.2;
+    document.getElementById('winH').value  = 1.2;
+    document.getElementById('winN').value  = 2;
+    document.getElementById('bL').value    = 230;
+    document.getElementById('bW').value    = 110;
+    document.getElementById('bH').value    = 75;
+    document.getElementById('joint').value = 10;
+    document.getElementById('wastage').value     = 5;
+    document.getElementById('bulkFactor').value  = 1.30;
+    document.getElementById('mortarMix').value   = '1:5';
+    document.getElementById('cementCost').value  = 900;
+    document.getElementById('sandCost').value    = 2500;
+    document.getElementById('brickCost').value   = 18;
+    document.getElementById('labourCost').value  = 350;
+
+    const ids = ['r_grossArea','r_openingArea','r_netArea','r_volume',
+                 'r_bricksNet','r_bricksGross','r_mortarWet','r_mortarDry',
+                 'r_cement','r_sand','r_costBrick','r_costCement','r_costSand',
+                 'r_costLabour','r_costTotal','r_costPerSqm','r_costPerCum'];
+    ids.forEach(id => document.getElementById(id).textContent = '—');
+  }
+
+  function toggleFormula() {
+    const box = document.getElementById('formulaBox');
+    const btn = document.getElementById('formulaToggleBtn');
+    const visible = box.style.display !== 'none';
+    box.style.display = visible ? 'none' : 'block';
+    btn.textContent = visible ? '▶ Show Formulas Used' : '▼ Hide Formulas Used';
+  }
+
+  // Auto-calculate on load with defaults
+  window.onload = calculate;
 </script>
 </body>
 </html>
